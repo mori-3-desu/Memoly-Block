@@ -51,7 +51,7 @@ export const GAME_CONFIG = {
 
 /* 難易度設定 */
 export const levelSettings = {
-  1: { level: 1, flashCount: 5, flashSpeed: 1000 },
+  1: { level: 1, flashCount: 5, flashSpeed: 600 },
   2: { level: 2, flashCount: 7, flashSpeed: 700 },
   3: { level: 3, flashCount: 10, flashSpeed: 400 },
 };
