@@ -1,0 +1,53 @@
+:root {
+    /* body */
+    --body-bg: #222;
+
+    /* star */
+    --star-color: gold;
+    --star-bg: rgba(186, 186, 186, 0.8);
+}
+html {
+    font-size: 62.5%;
+}
+
+body {
+    background-color: var(--body-bg);
+    margin: 0;
+    height: 100vh;
+}
+
+#decoration {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+}
+
+.star {
+    position: absolute;
+    font-size: 10rem;
+    color: var(--star-color);
+    transform: translate(-50%, -150%);
+    transition: transform 1.5s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+@media (max-width: 600px) {
+    .star {
+        font-size: 4rem;
+    }
+}
+
+.star.is-visible {
+    transform: translate(-50%, var(--drop-y));
+}
+
+.star::before {
+    content: "";
+    position: absolute;
+    bottom: 60%;
+    left: 50%;
+    width: 2px;
+    height: 100vh;
+    background-color: var(--star-bg);
+}

@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="keywords"
+      content="記憶力、記憶力ゲーム、脳トレ、短期記憶、無料ゲーム、アプリ"
+    />
+    <title>Memory Block</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;700&family=Share+Tech+Mono&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="src/style.css" />
+  </head>
+
+  <body>
+    <header>
+      <button
+        class="hamburger-menu"
+        type="button"
+        aria-expanded="false"
+        aria-controls="main-menu"
+        aria-label="メニューを開く"
+      >
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <nav id="nav-menu" class="nav-container" inert>
+        <p class="nav-title">MENU</p>
+        <ul class="nav-list">
+          <li>
+            <button class="nav-btn" data-target="level-screen" type="button">
+              GAME START
+            </button>
+          </li>
+
+          <li>
+            <button class="nav-btn" type="button">SETTING</button>
+          </li>
+
+          <li>
+            <button class="nav-btn" type="button">Q & A</button>
+          </li>
+
+          <li>
+            <button class="nav-btn" type="button">CONTACT</button>
+          </li>
+        </ul>
+      </nav>
+    </header>
+
+    <main>
+      <section id="title-screen" class="screen is-active">
+        <div class="container">
+          <div class="title-wrapper">
+            <h1>Memory Block</h1>
+
+            <div class="menu-list js-anim-wait">
+              <button
+                class="menu-btn"
+                id="game-start"
+                data-target="level-screen"
+                type="button"
+              >
+                GAME START
+              </button>
+              <button class="menu-btn" id="how-to-play" type="button">
+                HOW TO PLAY
+              </button>
+              <button class="menu-btn" id="config" type="button">
+                SETTING
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="level-screen" class="screen">
+        <div class="kanban-container js-anim-wait">
+          <div class="kanban-column" id="todo-column">
+            <h2 class="column-title">TODO <span>(LEVELS)</span></h2>
+
+            <ul class="card-list">
+              <li class="level-card is-playable" data-level="1">
+                <span class="level">LV.1</span>
+                <span class="level-name">EASY</span>
+              </li>
+
+              <li class="level-card is-locked" data-level="2">
+                <span class="level">LV.2</span>
+                <span class="level-name">NORMAL</span>
+                <span class="lock-icon">🔒</span>
+              </li>
+
+              <li class="level-card is-locked" data-level="3">
+                <span class="level">LV.3</span>
+                <span class="level-name">HARD</span>
+                <span class="lock-icon">🔒</span>
+              </li>
+            </ul>
+          </div>
+
+          <div class="kanban-column" id="doing-column">
+            <h2 class="column-title">DOING <span>(START)</span></h2>
+
+            <div class="drop-zone" id="game-start-zone">
+              <p class="drop-text">DROP HERE TO START</p>
+            </div>
+          </div>
+
+          <div class="kanban-column" id="clear-column">
+            <h2 class="column-title">CLEAR</h2>
+
+            <ul class="clear-list" id="clear-zone"></ul>
+          </div>
+        </div>
+
+        <button
+          class="title-back"
+          id="title-back-btn"
+          aria-label="タイトルへ戻る"
+          data-target="title-screen"
+          type="button"
+        >
+          ↩
+        </button>
+      </section>
+
+      <section id="info-screen" class="screen">
+        <div class="info-container js-anim-wait">
+          <h2 class="game-info">Touch the lights in order</h2>
+          <p class="information">
+            <span class="level-info">LEVEL<span class="level-num"></span></span>
+            <span class="start-info">Click to Start</span>
+          </p>
+          <button
+            class="btn-title-back"
+            id="title-back-to-btn"
+            type="button"
+            data-target="title-screen"
+          >
+            Return to Title
+          </button>
+        </div>
+      </section>
+
+      <section id="game-screen" class="screen">
+        <div class="timer-container js-anim-wait">
+          <span class="timer-char">TIME</span>
+
+          <div class="timer-value">
+            <span class="timer-sec" id="timer-seconds">00</span>
+            <span class="colon">:</span>
+            <span class="timer-ms" id="timer-millseconds">00</span>
+          </div>
+        </div>
+
+        <div class="count-container">
+          <span class="counter" id="flash-count">0</span>
+          <span class="counter">/</span>
+          <span class="counter" id="flash-count-max">5</span>
+        </div>
+
+        <div class="countdown-container" id="countdown-text">
+          <span class="countdown"></span>
+        </div>
+
+        <div class="game-board" id="simon-board"></div>
+      </section>
+
+      <section id="result-screen" class="screen">
+        <div class="shutter-container js-anim-wait" aria-hidden="true">
+          <div class="result-shutter-top">
+            <div class="slat"></div>
+          </div>
+
+          <div class="result-shutter-bottom">
+            <div class="slat"></div>
+          </div>
+        </div>
+
+        <div class="result-container">
+          <h2 class="result-title"></h2>
+          <div class="result-actions">
+            <button
+              class="game-btn game-next-btn"
+              data-level="1"
+              type="button"
+            >
+              NEXT
+            </button>
+            <button
+              class="game-btn game-retry-btn"
+              data-level="1"
+              type="button"
+            >
+              RETRY
+            </button>
+
+            <button
+              class="game-btn game-title-btn"
+              data-target="level-screen"
+              type="button"
+            >
+              SELECT
+            </button>
+            <button
+              class="game-btn game-title-btn"
+              data-target="title-screen"
+              type="button"
+            >
+              TITLE
+            </button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script type="module" src="src/main.js" defer></script>
+  </body>
+</html>

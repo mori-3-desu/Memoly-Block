@@ -1,0 +1,99 @@
+:root {
+  /* 変数を使うことで、色の変更が一箇所で済み、保守性が上がります */
+  --bg-gradient: linear-gradient(
+    to top,
+    rgb(106, 133, 241) 0%,
+    rgb(92, 100, 246) 50%,
+    rgb(41, 29, 219) 100%
+  );
+  --snow-color: rgb(238, 247, 255);
+  --glow-color: rgba(225, 255, 254, 0.9);
+  --fall-duration: 20s;
+}
+
+/* 1. リセットと土台の安定化 */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--bg-gradient);
+  background-attachment: fixed; /* リロード時の背景のガタつきを防止 */
+  overflow: hidden;
+  height: 100vh;
+  width: 100vw;
+}
+
+/* 2. コンテナの最適化 */
+#snow_falls {
+  position: fixed; /* relativeより固定のほうが重なり順が安定します */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none; /* 雪が邪魔でクリックできないのを防ぐ（重要！） */
+}
+
+/* 3. 雪の粒の最適化 */
+.snow {
+  position: absolute;
+  background-color: var(--snow-color);
+  border-radius: 50%;
+  opacity: 0.8;
+  /* 最初の「白い塊」を防ぐため、初期位置を画面外（上）に固定 */
+  top: -10%; 
+  width: var(--size);
+  height: var(--size);
+  left: var(--left); /* ここで横位置が決まる */
+  
+  /* will-change を使うとブラウザが「動くぞ」と構えるので動作が軽くなります */
+  will-change: top, opacity, transform;
+
+  animation:
+    fall var(--fall-duration) linear infinite,
+    sway var(--sway-duration, 4s) ease-in-out infinite,
+    twinkle 3s ease-in-out infinite;
+
+    /* ディレイの順番もアニメーションの順番に合わせる */
+  animation-delay: 
+    var(--fall-delay),   /* 落下の途中から開始 */
+    var(--sway-delay),   /* 揺れの途中から開始 */
+    var(--twinkle-delay);/* 点滅の途中から開始 */
+}
+
+.snow.glow {
+  box-shadow: 0 0 10px var(--glow-color);
+  /* 光る雪だけ少しだけぼかすと、奥行きが出てより綺麗になります */
+  filter: blur(1px);
+}
+
+/* 4. アニメーションの最適化 */
+@keyframes fall {
+  0% {
+    top: -10%;
+  }
+  100% {
+    /* vh単位を使うことで、画面サイズが変わっても確実に下まで落ちます */
+    top: 110vh;
+  }
+}
+
+/* 揺れ：translateXで左右に振る */
+@keyframes sway {
+  0%, 100% { translate: -15px 0; }
+  50% { translate: 15px 0; }
+}
+
+@keyframes twinkle {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scale(0.7);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+}

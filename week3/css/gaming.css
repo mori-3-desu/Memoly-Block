@@ -1,0 +1,156 @@
+:root {
+  /* =========================================
+     🎨 カラーパレット (Color Palette)
+     ========================================= */
+  --bg-body: #2b2b2b; /* 背景色 */
+  --bg-board: #444; /* キーボード本体の色 */
+  --bg-key: #e0e0e0; /* キーの色（通常） */
+  --text-main: #fff; /* メイン文字色 */
+  --text-key: #333; /* キーの文字色 */
+
+  --shadow-key: #888; /* キーの影の色 */
+  --glow-white: #fff; /* スネーク時の発光色 */
+
+  /* レインボーカラー定義 */
+  --rainbow-1: #ffadad; /* 赤 */
+  --rainbow-2: #ffd6a5; /* 橙 */
+  --rainbow-3: #fdffb6; /* 黄 */
+  --rainbow-4: #caffbf; /* 緑 */
+  --rainbow-5: #9bf6ff; /* 水 */
+  --rainbow-6: #a0c4ff; /* 青 */
+  --rainbow-7: #bdb2ff; /* 紫 */
+
+  /* =========================================
+     📐 サイズ・レイアウト (Layout)
+     ========================================= */
+  --board-width: 800px; /* キーボードの最大幅 */
+  --key-gap: clamp(4px, 1vw, 15px); /* キー同士の隙間 */
+  --board-radius: 15px; /* 本体の角丸 */
+  --key-radius: 6px; /* キーの角丸 */
+  --board-tilt: 20deg; /* 3Dの傾き角度 */
+
+  /* =========================================
+     ⏱ アニメーション設定 (Animation)
+     ========================================= */
+  --speed-snake: 2s; /* スネークの光る長さ */
+  --speed-wave: 1.5s; /* ウェーブの1周の速さ */
+
+  /* ★波のズレ具合（ここを変えると波の角度が変わる！） */
+  /* 数字を小さくすると波が緩やかに、大きくすると急になる */
+  --wave-step: -0.1s;
+}
+
+html {
+  font-size: 62.5%;
+}
+
+body {
+  margin: 0;
+  background-color: var(--bg-body);
+  color: var(--text-main);
+  font-family: sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+  box-sizing: border-box;
+}
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  grid-template-rows: repeat(4, 1fr);
+  gap: var(--key-gap);
+
+  width: 100%;
+  max-width: var(--board-width);
+  aspect-ratio: 3 / 1;
+
+  transform: perspective(500px) rotateX(var(--board-tilt));
+
+  background-color: var(--bg-board);
+  padding: 15px;
+  border-radius: var(--board-radius);
+  box-shadow:
+    0 20px 50px rgba(0, 0, 0, 0.5),
+    0 1px 0 #555 inset;
+}
+
+/* --- 普段の姿 --- */
+.block {
+  background-color: var(--bg-key);
+  border-radius: var(--key-radius);
+  cursor: pointer;
+  box-shadow:
+    0 4px 0 var(--shadow-key),
+    0 10px 10px rgba(56, 56, 56, 0.2);
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: var(--text-key);
+  font-weight: bold;
+  font-size: 1.4rem;
+  transition: all 0.2s ease;
+}
+
+/* --- モード1: スネーク --- */
+.block.mode-snake {
+  background: linear-gradient(135deg, var(--rainbow-2), var(--rainbow-5));
+  box-shadow: 0 0 15px var(--glow-white);
+  transform: scale(0.95);
+}
+
+/* --- モード2: ウェーブ --- */
+.block.mode-wave {
+  animation: rainbowFlow var(--speed-wave) linear infinite;
+
+  /* ★変数を計算式に組み込む */
+  animation-delay: calc((12 - var(--col) + var(--row)) * var(--wave-step));
+}
+
+/* --- レインボー定義 --- */
+@keyframes rainbowFlow {
+  0% {
+    background-color: var(--rainbow-1);
+    box-shadow: 0 0 5px var(--glow-white);
+  }
+  14% {
+    background-color: var(--rainbow-2);
+    box-shadow: 0 0 5px var(--glow-white);
+  }
+  28% {
+    background-color: var(--rainbow-3);
+    box-shadow: 0 0 5px var(--glow-white);
+  }
+  42% {
+    background-color: var(--rainbow-4);
+    box-shadow: 0 0 5px var(--glow-white);
+  }
+  57% {
+    background-color: var(--rainbow-5);
+    box-shadow: 0 0 5px var(--glow-white);
+  }
+  71% {
+    background-color: var(--rainbow-6);
+    box-shadow: 0 0 5px var(--glow-white);
+  }
+  85% {
+    background-color: var(--rainbow-7);
+    box-shadow: 0 0 5px var(--glow-white);
+  }
+  100% {
+    background-color: var(--rainbow-1);
+    box-shadow: 0 0 5px var(--glow-white);
+  }
+}
+
+/* --- クリック時 --- */
+.block:active {
+  box-shadow:
+    0 0 0 var(--shadow-key),
+    0 0 2px rgba(0, 0, 0, 0.2);
+  transform: translateY(4px);
+}

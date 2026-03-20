@@ -1,0 +1,93 @@
+:root {
+  /* レイアウト設定 */
+  --card-radius: 12px;
+  --gallery-gap: 2rem;
+  --min-card-width: 300px;
+
+  /* アニメーション設定 */
+  --anim-duration: 2s;
+  --anim-bezier: cubic-bezier(0.5, 1, 0.3, 1);
+  --clip-start-size: 60%; /* 中央からどのくらい絞るか */
+  
+  /* PC用ディレイ（遅延）の設定 */
+  --delay-step: 0.5s;
+
+  /* 背景画像（モノクロ側）のフィルタ */
+  --bg-contrast: 0.5;
+  --bg-saturate: 0;
+}
+
+body {
+  margin: 0;
+  text-align: center;
+}
+
+html {
+  font-size: 62.5%;
+}
+
+h1 {
+  margin: 50vh 0 50vh;
+}
+
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(var(--min-card-width), 1fr));
+  gap: var(--gallery-gap);
+  padding: 5rem 2rem;
+}
+
+.card {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: var(--card-radius);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.card img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: var(--card-radius);
+  object-fit: cover;
+  /* 変数を使用したtransition */
+  transition: clip-path var(--anim-duration) var(--anim-bezier);
+  will-change: clip-path;
+}
+
+/* 1枚目：モノクロ背景 */
+.card img:nth-child(1) {
+  filter: contrast(var(--bg-contrast)) saturate(var(--bg-saturate));
+}
+
+/* 2枚目：カラー（初期状態） */
+.card img:nth-child(2) {
+  clip-path: inset(
+    var(--clip-start-size) 
+    var(--clip-start-size) 
+    var(--clip-start-size) 
+    var(--clip-start-size) 
+    round var(--card-radius)
+  );
+}
+
+/* 2枚目：発火時 */
+.card.is-visible img:nth-child(2) {
+  clip-path: inset(0% 0% 0% 0% round var(--card-radius));
+}
+
+/* PC用レスポンシブ：3列ディレイの定数化 */
+@media (min-width: 768px) {
+  .gallery .card:nth-child(3n + 2) img {
+    transition-delay: var(--delay-step);
+  }
+
+  .gallery .card:nth-child(3n + 3) img {
+    /* calcを使ってステップを倍にする */
+    transition-delay: calc(var(--delay-step) * 2);
+  }
+}

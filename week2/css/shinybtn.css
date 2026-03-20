@@ -1,0 +1,247 @@
+:root {
+  /* --- 画面サイズ計算 --- */
+  --unit: min(calc(100vw / 192), calc(100vh / 108));
+  --height: clamp(80px, 10vh, 120px);
+  
+  /* --- 共通ボタン設定 --- */
+  --btn-radius: 100px;        /* ボタンの丸み */
+  --btn-border-width: 0.2em;  /* 枠線の太さ */
+  --btn-border-color: #a9a9a9;   /* 共通の枠線色 */
+  
+  /* --- Shinyボタン設定 --- */
+  --shiny-bg-start: #ffac7d;
+  --shiny-bg-end: #ad3939;
+  --shiny-duration: 3s;       /* 光るスピード */
+  --shiny-angle: 150deg;      /* 光の角度 */
+
+  /* --- Godボタン設定 --- */
+  --god-bg-normal: rgb(0, 0, 0);
+  --god-text-normal: #4a4a4a;
+  --god-border-normal: #404040;
+  --god-flash-color: rgb(255, 255, 0); /* 爆発時の黄色 */
+  --god-flash-border: #e9ff21;
+  --god-duration: 2s;         /* 爆発スピード */
+
+  /* --- Rainbowボタン設定 --- */
+  --rainbow-ring-inset: -10px; /* リングのはみ出し具合（マイナスを大きくすると太くなる） */
+  --rainbow-blur: 10px;        /* 光のぼかし具合 */
+  --rainbow-duration: 2s;      /* 1周するスピード */
+}
+
+body {
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgb(150, 150, 150);
+}
+
+#title {
+  gap: calc((var(--unit)) * 15);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding-top: var(--height);
+}
+
+.title-name {
+  font-size: calc(var(--unit) * 12);
+  margin: 0;
+  line-height: 1;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+.button-wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: calc(var(--unit) * 6);
+}
+
+/* ▼ ベースのボタン設定（共通変数適用） */
+.shiny-btn {
+  position: relative;
+  overflow: hidden;
+  
+  /* 変数適用 */
+  background: linear-gradient(45deg, var(--shiny-bg-start), var(--shiny-bg-end));
+  border: var(--btn-border-width) solid var(--btn-border-color);
+  border-radius: var(--btn-radius);
+  
+  font-size: calc(var(--unit) * 4);
+  font-weight: bold;
+  padding: 0.5em 4em;
+  cursor: pointer;
+}
+
+.btn-all {
+  font-size: calc(var(--unit) * 5);
+  border: var(--btn-border-width) solid var(--btn-border-color);
+  background: linear-gradient(45deg, #7dd1ff, #fb94ff);
+  border-radius: var(--btn-radius);
+  cursor: pointer;
+}
+
+/* --------------------------------------------------
+   1. Shiny Button
+-------------------------------------------------- */
+#btn::before {
+  content: "";
+  position: absolute;
+  height: 300%;
+  width: 200%;
+  top: 200%;
+  left: 0%;
+
+  background: linear-gradient(
+    to top,
+    rgba(255, 255, 255) 0%,
+    rgba(255, 255, 255) 30%,
+    rgba(255, 255, 255, 0.9) 75%,
+    rgba(255, 255, 255, 0.1) 100%
+  );
+
+  /* 変数適用 */
+  transform: rotate(var(--shiny-angle));
+}
+
+#btn.is-shiny::before {
+  /* 変数適用 */
+  animation: shiny-diagonal var(--shiny-duration) ease-out forwards;
+}
+
+@keyframes shiny-diagonal {
+  0% {
+    top: 200%;
+    left: 0%;
+    opacity: 0;
+    transform: rotate(var(--shiny-angle)) scale(1);
+  }
+  10% {
+    opacity: 1;
+  }
+  50% {
+    top: -200%;
+    left: -250%;
+    opacity: 1;
+    transform: rotate(var(--shiny-angle)) scale(5);
+  }
+  100% {
+    top: -200%;
+    left: -250%;
+    opacity: 0;
+    transform: rotate(var(--shiny-angle)) scale(6);
+  }
+}
+
+/* --------------------------------------------------
+   2. God Button
+-------------------------------------------------- */
+.shiny-btn:nth-child(2) {
+  /* 変数適用 */
+  background: var(--god-bg-normal);
+  color: var(--god-text-normal);
+  border: var(--btn-border-width) solid var(--god-border-normal);
+  
+  position: relative;
+  z-index: 1;
+}
+
+#btn-god.is-god {
+  /* 変数適用 */
+  animation: god-flash var(--god-duration) ease-out forwards;
+}
+
+@keyframes god-flash {
+  0% {
+    filter: brightness(1);
+    transform: scale(1);
+    box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+    
+    background-color: var(--god-bg-normal);
+    border-color: var(--god-border-normal);
+    color: var(--god-text-normal);
+  }
+
+  2% {
+    filter: brightness(5) contrast(2);
+    transform: scale(1.1);
+
+    /* 変数適用 */
+    background-color: var(--god-flash-color);
+    color: black;
+    border-color: var(--god-flash-border);
+    box-shadow: 0 0 100px var(--god-flash-color); /* 影の色も統一 */
+  }
+
+  100% {
+    filter: brightness(1);
+    transform: scale(1);
+    box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+
+    background-color: var(--god-bg-normal);
+    border-color: var(--god-border-normal);
+    color: var(--god-text-normal);
+  }
+}
+
+/* --------------------------------------------------
+   3. Rainbow Button
+-------------------------------------------------- */
+@property --rainbow-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+#btn-rainbow {
+  overflow: visible; 
+  position: relative;
+}
+
+#btn-rainbow::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+
+  /* 変数適用 */
+  inset: var(--rainbow-ring-inset);
+  filter: blur(var(--rainbow-blur));
+  
+  border-radius: inherit;
+
+  background: conic-gradient(
+    from var(--rainbow-angle),
+    red, orange, yellow, green, blue, indigo, violet, red
+  );
+
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+#btn-rainbow.is-rainbow::before {
+  opacity: 1;
+  /* 変数適用 */
+  animation: spin-rainbow-color var(--rainbow-duration) linear forwards;
+}
+
+@keyframes spin-rainbow-color {
+  0% {
+    --rainbow-angle: -360deg;
+  }
+  10% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 1;
+  }
+  75% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 0;
+  }
+}

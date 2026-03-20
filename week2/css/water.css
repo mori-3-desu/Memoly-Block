@@ -1,0 +1,145 @@
+:root {
+  --body-bg: #f0f0f0;
+  --main-bg-grad: linear-gradient(to bottom, #b6faff, #9ac4ff);
+}
+
+body {
+  background: var(--body-bg);
+  margin: 0;
+  overflow: hidden;
+}
+
+main {
+  height: 100dvh;
+  background: var(--main-bg-grad);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#puddle-wrapper {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  touch-action: none;
+  overflow: hidden;
+}
+
+/* --- コンテナ：すべての変数の定義場所 --- */
+.puddle-container {
+  position: absolute;
+  pointer-events: none;
+  width: 0;
+  height: 0;
+  display: block;
+  overflow: visible;
+  will-change: transform, opacity;
+
+  /* ▼ 1. 座標・形状の定数（ここを変えれば全部の配置が変わる） */
+  --center-pos: translate(-50%, -50%); /* ← これで呪文を省略！ */
+
+  /* ▼ 2. 色設定 (RGB) */
+  /* JSからは --c-base だけ渡していますが、ここでハイライトと影も定義しています */
+  --c-base: 255, 255, 255;   /* 液体の色（デフォルト） */
+  --c-high: 255, 255, 255;   /* 光の色（白） */
+  --c-shdw: 0, 0, 0;         /* 影の色（黒） */
+
+  /* ▼ 3. JSから上書きされる変数のデフォルト値 */
+  --duration-splash: 0.5s;
+  --duration-ripple: 0.5s;
+  --final-opacity: 1.5;
+  --ring-scale: 2.5;
+}
+
+/* --- 共通設定 --- */
+.drop-puddle {
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius: 50%;
+  pointer-events: none;
+  mix-blend-mode: overlay;
+
+  /* 初期状態 */
+  transform: var(--center-pos) scale(0);
+}
+
+/* 1. 中心（着水の衝撃と飛沫） */
+.puddle-center {
+  border: 4px solid rgba(var(--c-base), 0.6);
+  animation: splash var(--duration-splash) cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+/* 2. リング（広がる波紋） */
+.puddle-ring {
+  background-color: transparent;
+  border: 4px solid rgba(var(--c-base), 0.6);
+  animation: ripple var(--duration-ripple) cubic-bezier(0, 0, 0.2, 1) forwards;
+}
+
+/* --- アニメーション --- */
+
+@keyframes splash {
+  0% {
+    /* var(--center-pos) を使うことで記述がスッキリ！ */
+    transform: var(--center-pos) scale(0);
+    opacity: 0.9;
+    border-width: 8px;
+    box-shadow:
+      0 0 2px rgba(var(--c-high), 0.6),
+      inset 0 0 5px rgba(var(--c-shdw), 0.6);
+  }
+
+  50% {
+    transform: var(--center-pos) scale(0.6);
+    opacity: 0.4;
+    border-width: 6px;
+    box-shadow:
+      0 0 4px rgba(var(--c-high), 0.4),
+      inset 0 0 10px rgba(var(--c-shdw), 0.4);
+  }
+
+  65% {
+    transform: var(--center-pos) scale(0.7);
+    opacity: 0.3;
+    border-width: 3px;
+    box-shadow:
+      0 0 3px rgba(var(--c-high), 0.3),
+      inset 0 0 7px rgba(var(--c-shdw), 0.2);
+  }
+
+  75% {
+    transform: var(--center-pos) scale(0.8);
+    opacity: 0.2;
+    border-width: 2px;
+    box-shadow:
+      0 0 2px rgba(var(--c-high), 0.2),
+      inset 0 0 5px rgba(var(--c-shdw), 0.1);
+  }
+
+  100% {
+    transform: var(--center-pos) scale(1);
+    opacity: 0;
+    border-width: 0px;
+    box-shadow: none; /* noneで一括解除 */
+  }
+}
+
+@keyframes ripple {
+  0% {
+    transform: var(--center-pos) scale(0);
+    opacity: 0.8;
+    border-width: 4px;
+  }
+
+  25% {
+    opacity: 0.4;
+    border-width: 2px;
+  }
+
+  100% {
+    transform: var(--center-pos) scale(var(--ring-scale));
+    opacity: 0;
+    border-width: 0.2px;
+  }
+}

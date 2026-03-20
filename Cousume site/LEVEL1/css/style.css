@@ -1,0 +1,643 @@
+/* ============================================================
+  1. 変数設計（Design Tokens）
+  色・影・アニメーション時間をここで一元管理します。
+============================================================ */
+:root {
+  /* --- 🎨 1. Primitive Colors（基本の色素材） --- */
+  --color-gold: #ffd700;
+  --color-white: #fff;
+  --color-red: #d42426;
+  --color-orange: #f29c1f;
+
+  /* ボタンの影用カラー */
+  --shadow-btn-solid: #ed4e3c; /* 下の固い影 */
+  --shadow-btn-blur: rgba(190, 42, 40, 0.3); /* ふわっとした影 */
+
+  /* 雪用カラー */
+  --snow-color: rgb(183, 221, 255);
+  --glow-color: rgba(225, 255, 254, 0.9);
+
+  /* --- 🖌️ 2. Gradients（グラデーション） --- */
+  /* 背景：スポットライト風 */
+  --bg-dark-blue: radial-gradient(circle at center, #1a2a6c, #060053);
+
+  /* ボタン：赤～オレンジ */
+  --btn-grad: linear-gradient(to right, var(--color-red), var(--color-orange));
+
+  /* ボタン：光沢カラー */
+  --btn-shiny-grad: linear-gradient(
+    to top,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.5) 25%,
+    rgba(255, 255, 255, 0.8) 50%,
+    /* 真ん中を強く光らせる */ rgba(255, 255, 255, 0.3) 100%
+  );
+
+  /* 星飾り： 紐の色 */
+  --star-hanger-bg: rgba(186, 186, 186, 0.8);
+
+  --clear-bg: #6d6d6d;
+
+  /* --- 🌑 3. Shadows（影プリセット） --- */
+  /* タイトル用：金色のネオン発光 */
+  --text-shadow-gold:
+    0 0 15px rgba(255, 215, 0, 0.8), 0 0 30px rgba(255, 255, 255, 0.3);
+
+  /* ボタン用：立体的な影（通常 & Hover用） */
+  /* ※em単位なので、ボタンの文字サイズを変えると影も自動で伸縮します */
+  --box-shadow-btn-normal:
+    0 0.15em 0 var(--shadow-btn-solid), 0 0.25em 0.3em var(--shadow-btn-blur),
+    inset 0 0 0 0.1em var(--color-white);
+
+  /* ボタン用：凹んだ影（Active用） */
+  --box-shadow-btn-active:
+    0 0.05em 0 var(--shadow-btn-solid), 0 0.1em 0.2em var(--shadow-btn-blur),
+    inset 0 0 0 0.05em var(--color-white);
+
+  /* --- ⏱️ 4. Animations（時間設定） --- */
+  --anim-shiny-duration: 3s; /* ボタンのキラキラ周期 */
+  --anim-snow-duration: 25s; /* 雪の落下の基準時間 */
+
+  /* --- 📏 5. Layout（レイアウト計算） --- */
+  --header-h: clamp(60px, 8vh, 100px);
+  --unit: min(calc(100vw / 192), calc(100vh / 108));
+
+  /* --- 📐 rotate（角度） --- */
+  /* ボタン： 光沢の角度 */
+  --btn-rotate: 170deg;
+
+  /* --- 🗺 6. Z-Index Layers (重なり順の地図) --- */
+  /* 固定表示 */
+  --z-header: 1000; /* ヘッダー（常に一番手前） */
+
+  /* コンテンツ */
+  --z-information: 50; /* 説明文など */
+  --z-title: 100; /* #title や ボタン */
+
+  /* ボタン*/
+  --z-btn: 10;
+
+  /* 装飾 */
+  --z-snow: 1; /* 雪（一番奥） */
+  --z-star: 5; /* 星飾り（雪より手前、コンテンツより奥） */
+  --z-rope: -1; /* 装飾のパーツ（紐など） */
+
+  /* 仮の遷移ページ */
+  --z-result: 200; /* リザルト画面（メインより手前） */
+}
+
+/* ============================================================
+  2. リセット & ベース
+============================================================ */
+body {
+  margin: 0;
+  height: 100vh;
+  width: 100%;
+
+  /* 変数を適用 */
+  background: var(--bg-dark-blue);
+
+  overflow: hidden;
+  font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", sans-serif;
+}
+
+/* ============================================================
+  3. ヘッダー
+============================================================ */
+header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: var(--header-h);
+  display: flex;
+  align-items: center;
+  padding: 0 2rem;
+  background-color: rgba(190, 50, 50, 0.8);
+  border-bottom: 4px solid rgba(255, 215, 0, 0.6);
+  backdrop-filter: blur(8px);
+  z-index: var(--z-header);
+  box-sizing: border-box;
+}
+
+.top {
+  color: var(--color-gold);
+  font-size: clamp(15px, 8vh, 28px);
+  font-weight: bold;
+  letter-spacing: 0.1em;
+}
+
+/* ============================================================
+  4. メインコンテンツ
+============================================================ */
+#title {
+  position: relative;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: calc(var(--unit) * 5);
+  text-align: center;
+  padding-top: var(--header-h);
+  box-sizing: border-box;
+  z-index: var(--z-title);
+  /* 出現と明滅のアニメーション */
+  animation:
+    fadeUp 2s ease-out forwards,
+    glowPulse 3s infinite alternate;
+}
+
+/* タイトル文字 */
+.title-name {
+  font-family: "Pinyon Script", cursive;
+  font-size: calc(var(--unit) * 15);
+  color: var(--color-gold);
+  margin: 0;
+  line-height: 1;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+  /* 変数を適用（スッキリ！） */
+  text-shadow: var(--text-shadow-gold);
+  animation: name-glow 3s infinite ease-in-out;
+}
+
+/* 説明文エリア */
+.content-wrapper {
+  display: flex;
+  flex-direction: column;
+  font-family: "M PLUS Rounded 1c", sans-serif;
+  font-weight: bold;
+  align-items: center;
+  gap: calc(var(--unit) * 4);
+  z-index: var(--z-information);
+}
+
+.information {
+  font-size: calc(var(--unit) * 4);
+  color: var(--color-white);
+  line-height: 1.8;
+  margin: 0;
+}
+
+.click-to-explore {
+  font-size: calc(var(--unit) * 4);
+  color: var(--color-gold);
+  animation: bounce 1s infinite alternate ease-in-out;
+}
+
+/* タイトルの出現 */
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* タイトルの明滅 */
+@keyframes glowPulse {
+  0% {
+    text-shadow: 0 0 15px var(--color-gold);
+  }
+  100% {
+    text-shadow: var(--text-shadow-gold);
+  }
+}
+
+@keyframes name-glow {
+  0%,
+  100% {
+    filter: brightness(0.6);
+  }
+  50% {
+    filter: brightness(1.1);
+  }
+}
+
+/* ============================================================
+  5. ボタン（変数化で超スッキリ！）
+============================================================ */
+.button-wrapper {
+  opacity: 0;
+  animation: btn-fadeUp 1s ease-out forwards;
+  z-index: var(--z-btn);
+}
+
+.btn-campaign {
+  position: relative;
+  /* ここを一旦抜くとキラキラの角度が調整しやすいです */
+  overflow: hidden;
+  border: none;
+  /* 変数を適用 */
+  background: var(--btn-grad);
+  color: var(--color-white);
+
+  font-size: calc(var(--unit) * 5.5);
+  font-weight: bold;
+  border-radius: 100px;
+  padding: 0.5em 2em;
+  transform: translateZ(0); /* GPUを叩き起こす */
+  backface-visibility: hidden; /* さらにチラつきを抑えるお守り */
+
+  /* 変数を適用（通常時の影） */
+  box-shadow: var(--box-shadow-btn-normal);
+
+  cursor: pointer;
+  transition:
+    transform 0.3s,
+    box-shadow 0.3s,
+    filter 0.3s;
+  outline: none;
+}
+
+/* ホバー時 */
+.btn-campaign:hover {
+  transform: translateY(-5px) scale(1.05);
+
+  /* 変数を適用（ホバー時の影） */
+  box-shadow: var(--box-shadow-btn-normal);
+}
+
+/* クリック時（Active） */
+.btn-campaign:active {
+  transform: translateY(-2px) scale(0.98);
+
+  /* 変数を適用（凹んだ影） */
+  box-shadow: var(--box-shadow-btn-active);
+}
+
+/* キラキラアニメーション（光の帯） */
+.btn-campaign::before {
+  content: "";
+  position: absolute;
+  /* 位置もボタンの外の「安全圏」に置いておく */
+  top: -500%;
+  left: -200%;
+  width: 150%; /* 光の幅（ボタンの半分くらいの太さ） */
+  height: 300%;
+
+  /* 斜めの光の帯を作る */
+  background: var(--btn-shiny-grad);
+  /* 斜めに傾ける */
+  transform: rotate(var(--btn-rotate));
+  animation: shiny var(--anim-shiny-duration) infinite ease-in-out;
+}
+
+/* タイトルの出現 */
+@keyframes btn-fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shiny {
+  /* 0%の瞬間は完全に透明にして、移動中の姿を隠す */
+  0% {
+    top: -450%;
+    left: -200%;
+    opacity: 0;
+    transform: rotate(var(--btn-rotate)) scale(1);
+  }
+  15% {
+    opacity: 1;
+    transform: rotate(var(--btn-rotate)) scale(2);
+  }
+
+  50% {
+    top: 300%;
+    left: 200%;
+    opacity: 1;
+    transform: rotate(var(--btn-rotate)) scale(2.5);
+  }
+
+  75% {
+    top: 300%;
+    left: 200%;
+    opacity: 0.8;
+    transform: rotate(var(--btn-rotate)) scale(2.5);
+  }
+
+  /* 100%で完全に消し去る */
+  100% {
+    top: 200%;
+    left: 200%;
+    opacity: 0;
+  }
+}
+
+/* ============================================================
+  6. レスポンシブ
+============================================================ */
+@media (max-width: 650px) {
+  #title {
+    gap: calc(var(--unit) * 8);
+  }
+
+  .title-name {
+    font-size: calc(var(--unit) * 24);
+    white-space: normal;
+    line-height: 0.9;
+    width: 90%;
+  }
+
+  .information {
+    font-size: calc(var(--unit) * 5.8);
+  }
+
+  .click-to-explore {
+    font-size: calc(var(--unit) * 6);
+    color: var(--color-gold);
+    animation: bounce-mobile 1s infinite alternate ease-in-out;
+  }
+
+  .button-wrapper {
+    opacity: 0;
+    animation: mobile-btn-fadeUp 1s ease-out forwards;
+  }
+
+  .btn-campaign {
+    font-size: calc(var(--unit) * 9);
+    /* box-shadowはem指定の変数を使っているので、書き直し不要！ */
+  }
+
+  @keyframes bounce-mobile {
+    from {
+      transform: translateY(0);
+    }
+    to {
+      transform: translateY(1rem);
+    }
+  }
+
+  /* タイトルの出現 */
+  @keyframes mobile-btn-fadeUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+@keyframes bounce {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(1.5rem);
+  }
+}
+
+/* ============================================================
+  7. 雪のアニメーション
+============================================================ */
+#snow-falls {
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: var(--z-snow);
+}
+
+.snow {
+  position: absolute;
+  color: var(--snow-color); /* 文字色として白を指定 */
+  line-height: 1; /* 行間を詰めて中心に */
+  text-align: center;
+  /* 絵文字が勝手にカラー（青色など）になるのを防ぐ
+     透明な文字にして、影（text-shadow）で色をつける*/
+  color: transparent;
+  text-shadow: 0 0 0 var(--snow-color);
+  top: -5vh;
+  font-size: calc(var(--size, 3) * 0.1rem);
+  width: 1em;
+  height: 1em;
+  left: calc(var(--left, 0) * 1vw);
+
+  will-change: translateY, opacity, transform;
+  opacity: var(--opacity, 0.8);
+
+  animation:
+    fall var(--fall-duration, var(--anim-snow-duration)) linear infinite,
+    sway var(--sway-duration, 4s) ease-in-out infinite,
+    twinkle 3s ease-in-out infinite;
+
+  animation-delay:
+    var(--fall-delay, 0s), var(--sway-delay, 0s), var(--twinkle-delay, 0s);
+}
+
+.snow.glow {
+  text-shadow:
+    0 0 0 var(--snow-color),
+    0 0 2rem var(--glow-color);
+}
+
+@keyframes fall {
+  0% {
+    top: -5vh;
+  }
+  100% {
+    top: 110vh;
+  }
+}
+
+@keyframes sway {
+  0%,
+  100% {
+    translate: -2em 0;
+  }
+  50% {
+    translate: 2em 0;
+  }
+}
+
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 0.3;
+    transform: scale(0.7);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+}
+
+/* 星の飾り */
+#decoration {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: var(--z-star);
+}
+
+.star {
+  position: absolute;
+  font-size: calc(var(--unit) * 10);
+  color: var(--color-gold);
+  transform: translate(-50%, -150%);
+  transition: transform 1.5s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+@media (max-width: 650px) {
+  .star {
+    font-size: calc(var(--unit) * 15);
+  }
+}
+
+.star::before {
+  content: "";
+  position: absolute;
+  bottom: 50%;
+  left: 50%;
+  transform: translateX(-50%); /* 厳密な中央 */
+  width: calc(var(--unit) * 0.2);
+  height: 100vh;
+  background-color: var(--star-hanger-bg);
+  z-index: var(--z-rope);
+}
+
+.star.is-visible {
+  transform: translate(-50%, var(--drop-y));
+  will-change: filter, opacity;
+  animation: twinkle-star 3s ease-in-out infinite;
+  animation-delay: var(--delay);
+}
+
+@keyframes twinkle-star {
+  0%,
+  100% {
+    opacity: 0.8;
+    filter: drop-shadow(0 0 2px gold);
+  }
+  50% {
+    opacity: 1;
+    /** 
+    * 綺麗なアニメーションが作れるがfilterは周囲のピクセルを再計算する為、
+    * 数が多いとパフォーマンスが悪化するので注意 
+    */
+    filter: drop-shadow(0 0 8px gold) brightness(1.2);
+  }
+}
+
+#clear {
+  height: 100vh;
+  background-color: var(--clear-bg);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: calc(var(--unit) * 5);
+  z-index: var(--z-result);
+  position: relative;
+}
+
+.clear-back {
+  font-family: "M PLUS Rounded 1c", sans-serif;
+  font-size: calc(var(--unit) * 8);
+  color: var(--color-white);
+  text-align: center;
+}
+
+.btn-clear {
+  border: none;
+  /* 変数を適用 */
+  background: var(--btn-grad);
+  color: var(--color-white);
+  font-size: calc(var(--unit) * 6);
+  font-family: "M PLUS Rounded 1c", sans-serif;
+  font-weight: bold;
+  border-radius: 100px;
+  padding: 0.5em 2em;
+  box-sizing: border-box;
+
+  /* 変数を適用（通常時の影） */
+  box-shadow: var(--box-shadow-btn-normal);
+
+  cursor: pointer;
+  transition:
+    transform 0.3s,
+    box-shadow 0.3s;
+  outline: none;
+}
+
+.btn-clear:hover {
+  transform: translateY(-5px) scale(1.05);
+
+  box-shadow: var(--box-shadow-btn-normal);
+}
+
+.btn-clear:active {
+  transform: translateY(-2px) scale(0.98);
+  box-shadow: var(--box-shadow-btn-active);
+}
+
+@media (max-width: 650px) {
+  .clear-back {
+    font-size: calc(var(--unit) * 12);
+    line-height: 1.2;
+  }
+
+  .btn-clear {
+    font-size: calc(var(--unit) * 10);
+    /* box-shadowはem指定の変数を使っているので、書き直し不要！ */
+  }
+}
+
+/* 初期状態：clearは隠しておく */
+#clear {
+  display: none;
+}
+
+/* 状態：is-active クラスがついている時だけ表示を逆転 */
+.is-active #title {
+  display: none;
+}
+.is-active #clear {
+  display: flex;
+}
+
+/* ============================================================
+   8. アクセシビリティ対応 (Reduce Motion)
+   OS設定で「視覚効果を減らす」がONの場合、動きを止める
+============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  /* 全要素に対してアニメーションと遷移をほぼゼロにする */
+  *,
+  *::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* 個別の調整：ボタンのホバー移動などを完全に無効化 */
+  .btn-campaign:hover,
+  .btn-clear:hover {
+    transform: none !important; /* 動かないようにする */
+  }
+
+  /* キラキラ（光の帯）はチラつくので消す */
+  .btn-campaign::before {
+    display: none !important;
+  }
+
+  /* タイトルなどの点滅も消す */
+  .title-name,
+  .click-to-explore {
+    animation: none !important;
+  }
+}

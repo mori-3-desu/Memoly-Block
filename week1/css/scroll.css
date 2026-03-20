@@ -1,0 +1,39 @@
+:root {
+    --bg-color: aqua;
+    --container-width: 1200px;
+    --container-height: 600px; /* 高さも変数にすると管理が楽 */
+}
+
+body {
+    background-color: var(--bg-color);
+}
+
+#scroll-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: var(--container-width);
+    height: var(--container-height);
+    transform: translate(-50%, -50%);
+    overflow: hidden;
+}
+
+#scroll-image {
+    display: flex;
+    /* 1200px * 4枚分を計算式で書くと意図が伝わりやすい */
+    width: calc(var(--container-width) * 4); 
+    height: 100%;
+}
+
+#scroll-image img {
+    width: var(--container-width);
+    height: 100%;
+    object-fit: cover;
+    margin-right: -1px; 
+    will-change: transform;
+    backface-visibility: hidden;
+}
+
+#scroll-image img.mirror {
+    transform: scaleX(-1);
+}

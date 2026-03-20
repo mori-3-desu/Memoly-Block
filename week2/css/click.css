@@ -1,0 +1,116 @@
+@charset "UTF-8";
+
+html {
+  font-size: 62.5%;
+}
+
+body {
+  margin: 0;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  height: 100dvh;
+  background: #222;
+  overflow: hidden;
+  /* ★修正2: アイコン同士の間隔をあける */
+  gap: 15rem;
+}
+
+.effect-trigger {
+    /* 1. 大きさとクリック判定 */
+    width: 12rem;
+    height: 12rem;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+    /* 3. ズレ防止の重要設定 */
+    line-height: 1; /* 行間の余白を消す */
+    user-select: none;
+    
+    /* 5. 他の要素との重なり順 */
+    position: relative;
+    z-index: 10;
+}
+
+/* --- アニメーションする「中身」 --- */
+.icon-content {
+    font-size: 10rem;
+    display: block; /* 必須：変形を安定させるため */
+    transition: transform 0.1s ease-out;
+    /* ★重要: 絵文字のベースラインズレを補正 */
+    transform: translateY(-8%); 
+}
+
+/* ホバーした時、動くのは「中身」だけ */
+.effect-trigger:hover .icon-content {
+    transform: translateY(-5%) scale(1.1);
+}
+
+/* 押した時、動くのは「中身」だけ */
+.effect-trigger:active .icon-content {
+    transform: translateY(-5%) scale(0.5);
+}
+
+/* --- 以下、パーティクル（飛び散るやつ）の設定 --- */
+.pop-particle {
+  position: fixed;
+  left: 0;
+  top: 0;
+  pointer-events: none;
+  opacity: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* 共通アニメーション */
+  animation: popMove 0.8s forwards cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* 種類ごとの色や形 */
+
+/* 星（data-type="star"） */
+.type-star {
+  color: #fff7c8;
+}
+
+.type-star-glow {
+  color: #ffd700;
+  filter: brightness(1.2);
+}
+
+/* 泡（data-type="bubble"） */
+.type-bubble {
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 30% 30%,
+    rgba(255, 255, 255, 0.9),
+    rgba(255, 255, 255, 0.1) 60%
+  );
+  width: 1em;
+  height: 1em;
+  box-shadow: 0 0 4px rgba(255, 255, 255, 0.5);
+  opacity: 0.8;
+}
+
+/* ハート（data-type="heart"） */
+.type-heart {
+  color: #ff6b6b; /* ピンク赤 */
+  text-shadow: 0 0 5px #ffb3b3;
+}
+
+/* アニメーション定義 */
+@keyframes popMove {
+  0% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 1;
+  }
+  100% {
+    /* JSから受け取った移動量(--move-x)に中心補正(-50%)を足す */
+    transform: translate(calc(-50% + var(--move-x)), calc(-50% + var(--move-y)))
+      scale(1) rotate(180deg);
+
+    opacity: 0;
+  }
+}

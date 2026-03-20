@@ -1,0 +1,96 @@
+body {
+  margin: 0;
+  min-height: 100dvh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  background-color: #fdf5ff; /* 少し背景色をつけて雰囲気を出す */
+}
+
+html {
+  font-size: 62.5%;
+}
+
+/* 幕（ローディング画面全体） */
+#loading-screen {
+  /* 画面全体を覆う魔法の呪文 */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  
+  /* ゲーム画面より手前に表示する（数字が大きいほど手前） */
+  z-index: 9999;
+  
+  /* 背景色（これがないと透けてゲームが見えちゃう） */
+  background-color: #fdf5ff;
+  
+  /* 中身（ゲージ）を真ん中に置く */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  
+  /* フェードアウト用のアニメーション設定 */
+  transition: opacity 1s ease-out, visibility 1s ease-out;
+}
+
+/* 消える時のクラス */
+#loading-screen.fade-out {
+  opacity: 0;           /* 透明にする */
+  visibility: hidden;   /* 存在を見えなくする（クリック判定も消える） */
+  pointer-events: none; /* 万が一残ってても裏側をクリックできるようにする */
+}
+
+.gauge {
+  position: relative;
+  overflow: hidden;
+  width: min(700px, 80vw);
+  height: 30px;
+  border: 0.3em solid #ff8ffb;
+  background: hsl(294, 100%, 98%);
+  border-radius: 20px;
+  /* 影をつけて立体感を出す */
+  box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.gauge-bar {
+  height: 100%; /* 親の高さに合わせる */
+  border-radius: 20px;
+  background: linear-gradient(90deg, #ff8ffb, #ff4df7); /* グラデーションでリッチに */
+  
+  /* ポイント1：幅は固定せず、アニメーション側で制御する */
+  width: 0; 
+  
+  /* ポイント2：秒数を短くし、linearではなく緩急をつける */
+  animation: smoothLoading 2s infinite cubic-bezier(0.35, 0.65, 0.88, 1);
+  
+  /* 光彩を追加してスピード感を出す */
+  box-shadow: 0 0 10px rgba(255, 77, 247, 0.5);
+}
+
+/* ポイント3：左から右へ突き抜ける動き */
+@keyframes smoothLoading {
+  0% {
+    width: 0%;
+    transform: translateX(0%);
+  }
+  20% {
+    width: 50%; /* 動き出しで少し伸びる */
+  }
+  50% {
+    width: 70%; /* 真ん中で加速してビヨーンと伸びる（慣性） */
+    transform: translateX(50%); /* 位置も進む */
+  }
+  80% {
+    width: 70%; /* 減速しながら縮む */
+  }
+  100% {
+    width: 0%;
+    transform: translateX(250%); /* 右端へ消える（親の幅を超える値） */
+  }
+}
+

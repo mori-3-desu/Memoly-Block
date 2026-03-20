@@ -1,0 +1,48 @@
+:root {
+  --unit: min(calc(100vw / 192), calc(100vh / 108));
+}
+
+body {
+  margin: 0;
+  overflow: hidden;
+  background: #222;
+}
+
+.timer-wrapper {
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+  container-type: inline-size;
+}
+
+.timer-container {
+  display: flex;
+  font-family: "M PLUS Rounded 1c", sans-serif;
+  font-weight: bold;
+  font-size: 10cqi;
+  color: #d6d6d6;
+  text-shadow: 0.3cqi 0.3cqi 0 #fff;
+  letter-spacing: 0.8cqi;
+  text-indent: 0.4cqi;
+}
+
+.timer-container span {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.colon {
+  position: relative;
+  top: -0.08em;
+}
+
+.millseconds {
+    font-size: 4cqi;
+    position: relative;
+    top: 6.5cqi;
+}
+

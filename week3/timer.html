@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>タイマー</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/timer.css" />
+  </head>
+
+  <body>
+    <div class="timer-wrapper">
+      <div class="timer-container">
+        <span class="timer" id="timer-hour">00</span>
+        <span class="colon">:</span>
+        <span class="timer" id="timer-minute">00</span>
+        <span class="colon">:</span>
+        <span class="timer" id="timer-seconds">00</span>
+        <span class="millseconds" id="timer-millseconds">00</span>
+      </div>
+      <button
+        id="timer-btn"
+        class="stop-watch"
+        type="button"
+      ></button>
+    </div>
+
+    <script src="js/timer.js" defer></script>
+  </body>
+</html>

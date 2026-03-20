@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ボタンアニメーション</title>
+    <link rel="stylesheet" href="css/button.css">
+</head>
+
+<body>
+    <div id="container">
+        <div class="count-box">
+            <div id="display-count">
+                <span id="count-number">0</span>
+            </div>
+
+            <div class="button-container" id="count-button">
+                <button id="btn-main" class="btn-menu count" data-value="5">+5</button>
+                <button id="btn-sub"  class="btn-menu sub" data-value="3">+3 </button>
+                <button id="btn-small" class="btn-menu mini" data-value="1">+1</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/constant.js" defer></script>
+    <script src="js/button.js" defer></script>
+</body>
+</html>

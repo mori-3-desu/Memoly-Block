@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ハンバーガーメニュー</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Caveat:wght@400..700&family=M+PLUS+Rounded+1c:wght@400;700&family=Montserrat:wght@400;700&family=Noto+Sans+JP:wght@400;700&family=Noto+Serif+JP:wght@400;700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/hamburger.css" />
+  </head>
+
+  <body class="preload">
+    <header class="header-container">
+      <div class="title">
+        <h1>hamBurgerkafe</h1>
+      </div>
+
+      <button
+        class="hamburger-menu"
+        id="hamburger"
+        type="button"
+        aria-expanded="false"
+        aria-controls="myContent"
+        aria-label="メニューを開く"
+      >
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <nav class="nav-container">
+        <p class="menu-title">~ MENU ~</p>
+        <ul class="list">
+          <li>Home</li>
+          <li>Foodmenu</li>
+          <li>Abort</li>
+          <li>Q&A</li>
+        </ul>
+      </nav>
+    </header>
+    <div class="overlay" id="overlay"></div>
+
+    <script src="js/hamburger.js" defer></script>
+  </body>
+</html>

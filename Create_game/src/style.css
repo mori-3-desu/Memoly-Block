@@ -1,0 +1,1222 @@
+/* =========================================
+   2026 Modern CSS Architecture
+   @layer を使ってスタイルの優先順位を絶対的に管理する
+========================================= */
+@layer reset, tokens, base, layout, components, state, animations;
+
+/* =========================================
+   1. Reset (@layer reset)
+========================================= */
+@layer reset {
+  *,
+  *::before,
+  *::after {
+    font-family: "Chakra Petch", sans-serif;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    user-select: none; /* 文字の選択を禁止 */
+    -webkit-tap-highlight-color: transparent; /* スマホでタップした時に一瞬でる青い半透明枠を完全に消し去る */
+  }
+}
+
+/* =========================================
+   2. Tokens (@layer tokens)
+========================================= */
+@layer tokens {
+  :root {
+    /* Colors */
+    --color-bg-base: #000;
+    --color-text-main: #fff;
+    --color-text-muted: #bbb;
+    --color-accent-blue: #caf6ff;
+    --color-accent-blue-dark: #0000ff;
+    --color-accent-cyan: #00ffc3;
+    --color-accent-green: #00ffaa;
+    --color-accent-gold: gold;
+    --color-accent-red: #ff0000;
+    --color-nav-bg: #07006b;
+
+    /* Gradients */
+    --bg-grad-main: linear-gradient(
+      to bottom,
+      rgb(0, 60, 121) 0%,
+      rgb(36, 52, 194) 40%,
+      rgb(90, 108, 197) 70%,
+      rgb(142, 165, 233) 100%
+    );
+    --bg-grad-btn: linear-gradient(135deg, #00d2ff 0%, #0099ff 100%);
+    --bg-grad-card: linear-gradient(
+      150deg,
+      rgb(0, 169, 181) 20%,
+      rgb(217, 104, 255) 100%
+    );
+
+    /* Shadows */
+    --shadow-text-heavy: 0.05em 0.05em rgba(0, 0, 0, 0.7);
+    --shadow-text-glow: 0.2rem 0.2rem 0 #fff;
+    --shadow-box-glow: 0 0 1em #fff;
+
+    /* Z-Index */
+    --z-screen: 1;
+    --z-nav-menu: 5;
+    --z-hamburger: 10;
+    --z-info: 20;
+    --z-countdown: 100;
+    --z-drag: 1000; /* ドラッグ要素用の最前面 */
+
+    /* Animations */
+    --ease-smooth: cubic-bezier(0.4, 0.6, 0, 1);
+    --ease-spring: cubic-bezier(0.18, 0.89, 0.32, 1.28);
+    --ease-shutter: cubic-bezier(0.2, 1, 0.3, 1);
+    --ease-door: cubic-bezier(0.175, 1.1, 0.61, 0.98);
+
+    /* Transition Durations */
+    --duration-instant: 0.2s;
+    --duration-fast: 0.3s;
+    --duration-base: 0.4s;
+    --duration-slow: 0.5s;
+    --duration-door: 0.6s;
+    --duration-title: 0.8s;
+    --duration-menu: 1.2s;
+
+    /* Blur */
+    --blur-overlay: 5px;
+    --blur-backdrop: 8px;
+
+    /* Glass / Overlay Colors */
+    --color-glass-fill: rgba(255, 255, 255, 0.2);
+    --color-glass-border: rgba(255, 255, 255, 0.5);
+    --color-overlay-dark: rgba(0, 0, 0, 0.6);
+    --color-board-bg: rgba(0, 255, 255, 0.5);
+    --color-shadow-dark: rgba(0, 0, 0, 0.5);
+
+    /* Additional Accents */
+    --color-accent-aqua: #00ffea;
+
+    /* Shadow Tones */
+    --color-shadow-light: #ddd;
+  }
+}
+
+/* =========================================
+   3. Base (@layer base)
+========================================= */
+@layer base {
+  body {
+    overflow: hidden;
+    background-color: var(--color-bg-base);
+  }
+}
+
+/* =========================================
+   4. Layout (@layer layout)
+========================================= */
+@layer layout {
+  .screen {
+    position: absolute;
+    inset: 0;
+    height: 100dvh;
+    width: 100%;
+    display: grid;
+    place-items: center;
+    visibility: hidden;
+    background: var(--bg-grad-main);
+    pointer-events: none;
+  }
+
+  .container {
+    text-align: center;
+    width: min(70%, 1600px);
+    container-type: inline-size;
+  }
+
+  .kanban-container {
+    width: 95%;
+    height: 90dvh;
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: repeat(3, minmax(0, 1fr));
+    gap: clamp(1rem, 4cqi, 5rem) clamp(0.5rem, 3cqi, 4rem);
+    margin-inline: auto;
+  }
+
+  @media (width >= 768px) {
+    .kanban-container {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-rows: 1fr;
+    }
+  }
+
+  .kanban-column {
+    background: var(--color-glass-fill);
+    border: 1px solid var(--color-glass-border);
+    border-radius: 12px;
+    padding: 1.5em;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    overflow: hidden;
+  }
+
+  .card-list,
+  .drop-zone,
+  .clear-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    flex-grow: 1;
+    list-style: none;
+    overflow-y: auto;
+    min-width: 0;
+    padding: 1em;
+    /* モダンスクロールバー（Firefox/Chrome両対応） */
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-glass-border) transparent;
+  }
+
+  .info-container {
+    position: relative;
+    width: 100%;
+    height: 100dvh;
+    display: grid;
+    place-items: center;
+    align-content: center;
+    text-align: center;
+    gap: clamp(1.5rem, 3cqi, 4rem);
+    container-type: inline-size;
+    z-index: var(--z-info);
+    background-color: var(--color-overlay-dark);
+    backdrop-filter: blur(var(--blur-backdrop));
+  }
+
+  .information {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(1.5rem, 2.5cqi, 3rem);
+  }
+
+  .game-board {
+    display: grid;
+
+    --grid-size: 5;
+
+    grid-template-columns: repeat(var(--grid-size), 1fr);
+    grid-template-rows: repeat(var(--grid-size), 1fr);
+
+    gap: clamp(0.15rem, 5dvw, 0.5rem);
+
+    width: min(80dvw, 65vh, 1200px);
+    aspect-ratio: 1 / 1;
+    margin-inline: auto;
+
+    box-shadow: 0 0.1em 0.3em var(--color-shadow-dark);
+    background-color: var(--color-board-bg); /* うっすら背景 */
+    padding: clamp(0.2em, 1vw, 0.4em); /* 外枠との余白 */
+    border-radius: 1.5rem;
+  }
+  @media (width <= 768px) {
+    .game-board {
+      margin-top: 1.5rem;
+    }
+  }
+
+  .timer-container {
+    position: absolute;
+    display: grid;
+    place-items: center;
+
+    width: clamp(8rem, 20vw, 18rem);
+    top: 3dvw;
+    left: clamp(0.5rem, 2vw, 1.8rem);
+
+    text-align: center;
+    white-space: nowrap;
+
+    container: inline-size;
+  }
+
+  @media (width >= 1920px) and (orientation: landscape) {
+    .timer-container {
+      top: 6rem;
+      right: clamp(4rem, 12vw, 9.5rem);
+      left: auto;
+      width: 25rem;
+    }
+  }
+
+  .timer-value {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum";
+    font-weight: 600;
+    width: clamp(10rem, 20vw, 25rem);
+
+    display: flex;
+    justify-content: center;
+    align-items: baseline;
+  }
+
+  .count-container {
+    position: absolute;
+    right: clamp(3rem, 5.5vw, 11.2rem);
+    top: 8dvw;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: clamp(0.5rem, 2cqi, 2rem);
+    text-align: center;
+
+    container: inline-size;
+  }
+
+  .countdown-container {
+    position: absolute;
+    display: grid;
+    place-items: center;
+
+    pointer-events: none;
+    z-index: var(--z-countdown);
+  }
+
+  @media (width >= 1920px) and (orientation: landscape) {
+    .count-container {
+      right: clamp(8rem, 10dvw, 15.5rem);
+      top: clamp(30rem, 45dvw, 65rem);
+    }
+  }
+
+  .result-container {
+    position: relative;
+    display: grid;
+    place-items: center;
+    place-content: center;
+    text-align: center;
+
+    width: 100%;
+    height: 100dvh;
+    gap: clamp(2rem, 20dvh, 15rem);
+    opacity: 0;
+
+    container-type: inline-size;
+  }
+
+  .shutter-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    pointer-events: none;
+  }
+
+  .result-actions {
+    display: flex;
+    gap: clamp(1rem, 6.5cqi, 8rem);
+
+    @media (width <= 600px) {
+      flex-direction: column;
+      gap: 1rem;
+      transform: translateY(15%);
+    }
+  }
+}
+
+/* =========================================
+   5. Components (@layer components)
+========================================= */
+@layer components {
+  /* --- 共通タイトル --- */
+  .title-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: clamp(3rem, 10cqi, 16rem);
+    width: 100%;
+
+    & > h1 {
+      color: var(--color-accent-blue);
+      line-height: 1.1;
+      letter-spacing: 0.05em;
+      text-shadow: var(--shadow-text-heavy);
+      font-size: clamp(6rem, 13cqi, 20rem);
+      white-space: normal;
+      word-wrap: break-word;
+      opacity: 0;
+    }
+
+    @container (width >= 600px) {
+      & > h1 {
+        white-space: nowrap;
+      }
+    }
+  }
+
+  /* --- メニューボタン --- */
+  .menu-list {
+    display: flex;
+    flex-direction: column;
+    white-space: nowrap;
+    gap: clamp(2rem, 5cqi, 8rem);
+    list-style: none;
+    opacity: 0;
+
+    & > button {
+      --move: 5px;
+      appearance: none;
+      border: none;
+      cursor: pointer;
+      color: var(--color-accent-blue);
+      background: var(--bg-grad-btn);
+      font-size: clamp(1.5rem, 3cqi, 4rem);
+      padding: 0.3em 1.5em;
+      clip-path: polygon(15% 10%, 100% 10%, 85% 100%, 0% 90%);
+      transition:
+        transform var(--duration-instant) var(--ease-spring),
+        color var(--duration-instant);
+
+      @container (min-width: 600px) {
+        --move: 10px;
+      }
+
+      &:hover {
+        color: var(--color-text-main);
+        transform: translate(var(--move), calc(var(--move) * -1));
+      }
+      &:active {
+        color: var(--color-text-main);
+        transform: translate(calc(var(--move) * -1), var(--move));
+      }
+    }
+  }
+
+  /* --- ハンバーガーメニュー --- */
+  .hamburger-menu {
+    --burger-offset: 9px;
+    --burger-slide: 20px;
+    position: absolute;
+    z-index: var(--z-hamburger);
+    width: clamp(3rem, 10dvw, 4.5rem);
+    height: clamp(3rem, 10dvw, 4.5rem);
+    top: clamp(1.2rem, 4dvw, 2rem);
+    right: clamp(1.2rem, 4dvw, 2rem);
+    gap: clamp(0.4rem, 1.5dvw, 0.6rem);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border: 2px solid var(--color-accent-cyan);
+    border-radius: 50%;
+    cursor: pointer;
+
+    opacity: 1;
+    transform: scale(1);
+    pointer-events: auto;
+
+    /* 魔法の1行：変化が起きた時、フワッとアニメーションさせる！ */
+    transition:
+      opacity var(--duration-base) var(--ease-smooth),
+      transform var(--duration-base) var(--ease-smooth);
+
+    & span {
+      display: block;
+      height: 2px;
+      width: 60%;
+      background-color: var(--color-bg-base);
+      border-radius: 2px;
+      transition:
+        transform var(--duration-fast),
+        opacity var(--duration-fast);
+    }
+
+    @media (min-width: 600px) {
+      --burger-offset: 12px;
+    }
+  }
+
+  /* --- ナビゲーションドロワー --- */
+  .nav-container {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: min(70%, 440px);
+    height: 100dvh;
+    container-type: inline-size;
+    padding-top: clamp(5em, 40cqi, 11em);
+    z-index: var(--z-nav-menu);
+    background: var(--color-nav-bg);
+    box-shadow: var(--shadow-box-glow);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 2rem;
+    visibility: hidden;
+    transform: translateX(100%);
+    opacity: 0;
+    transition:
+      transform var(--duration-slow) var(--ease-smooth),
+      opacity var(--duration-slow),
+      visibility var(--duration-slow);
+  }
+
+  .nav-title {
+    font-size: clamp(3rem, 18cqi, 5rem);
+    font-weight: 600;
+    color: var(--color-accent-green);
+    text-shadow: var(--shadow-text-glow);
+    letter-spacing: 0.1em;
+  }
+
+  .nav-list {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(1.5rem, 5cqi, 3rem);
+    list-style: none;
+    padding: 0;
+    text-align: center;
+
+    & .nav-btn {
+      font-size: clamp(1rem, 6cqi, 1.5rem);
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      color: var(--color-text-main);
+      background: none;
+      border: none;
+      cursor: pointer;
+      transition:
+        transform var(--duration-fast),
+        color var(--duration-fast);
+
+      &:hover {
+        color: color-mix(in srgb, var(--color-accent-blue) 70%, white 30%);
+        transform: translateY(-10%);
+      }
+    }
+  }
+
+  /* --- カンバン関係 --- */
+  .column-title {
+    color: var(--color-accent-blue);
+    font-size: clamp(1rem, 4cqi, 3rem);
+    text-align: left;
+    letter-spacing: 0.1em;
+    border-bottom: 2px solid var(--color-glass-fill);
+    padding-bottom: 0.5rem;
+    white-space: nowrap;
+
+    & span {
+      font-size: 0.4em;
+      color: var(--color-text-main);
+      opacity: 0.7;
+    }
+  }
+
+  /* 親を明示的に指定した */
+  .drop-zone .drop-text {
+    font-size: clamp(1rem, 2cqi, 2rem);
+    color: var(--color-accent-blue-dark);
+    margin-inline: auto;
+    text-align: center;
+    animation: blinking 1s infinite alternate;
+  }
+
+  /* --- レベルカード --- */
+  .level-card {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+    max-width: clamp(70%, 50cqi, 90%);
+    min-height: 1.5lh;
+    isolation: isolate;
+    font-size: clamp(1rem, 2.5cqi, 3rem);
+    color: var(--color-accent-cyan);
+    text-shadow: 0.06em 0.06em 0 var(--color-bg-base);
+    background: var(--bg-grad-card);
+    border: 0.1em solid var(--color-accent-blue-dark);
+    padding: 0.3em 2.5em 0.3em 0.5em;
+    box-shadow:
+      inset 0 0.04em 0.05em rgba(255, 255, 255, 0.9),
+      inset 0 0.1em 0.1em rgba(255, 255, 255, 0.4),
+      inset 0 -0.03em 0.08em rgba(0, 0, 0, 0.15);
+    border-radius: 0.6lh;
+    white-space: nowrap;
+    cursor: pointer;
+    touch-action: none;
+
+    &:hover {
+      transform: scale(1.02);
+    }
+    &:active {
+      transform: scale(0.95);
+    }
+
+    & .lock-icon {
+      position: absolute;
+      right: -0.6em;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 1;
+    }
+  }
+
+  .title-back {
+    --_bg: rgb(0, 179, 255);
+    --_bg-hover: rgb(30, 162, 219);
+    --_border: #81ffd5;
+
+    position: absolute;
+    right: 2rem;
+    bottom: 1.5rem;
+    font-size: clamp(1.5rem, 2.5cqi, 2.5rem);
+    font-weight: 600;
+    color: var(--color-text-main);
+    background: var(--_bg);
+    padding: 0.4em 0.6em;
+    border-radius: 1lh;
+    border: 0.1em solid var(--_border);
+    cursor: pointer;
+    transition:
+      transform var(--duration-instant) var(--ease-smooth),
+      background-color var(--duration-instant) var(--ease-smooth);
+
+    &:hover {
+      transform: scale(1.05);
+      background-color: var(--_bg-hover);
+    }
+    &:active {
+      transform: scale(0.95);
+    }
+  }
+
+  .block {
+    --bg-grad-block: linear-gradient(
+      to top,
+      rgb(148, 212, 255) 30%,
+      rgb(0, 234, 255) 100%
+    );
+
+    position: relative;
+    overflow: hidden;
+    transform: translateZ(0); /* チラつき防止 */
+    mask-image: -webkit-radial-gradient(white, black);
+
+    background: var(--bg-grad-block);
+    border: 0.05em solid var(--color-accent-blue);
+    border-radius: 15%;
+    cursor: pointer;
+    box-shadow:
+      inset 0 0.12em 0.17em rgba(255, 255, 255, 0.9),
+      inset 0 0.02em 0.02em rgba(255, 255, 255, 0.4),
+      inset 0 -0.03em 0.08em rgba(0, 0, 0, 0.15);
+
+    & .door {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      background: conic-gradient(
+        from -45deg,
+        #9dcde9 0deg 90deg,
+        #457b9d 90deg 180deg,
+        #0d2241 180deg 270deg,
+        #69a1c4 270deg 360deg
+      );
+      transition: transform var(--duration-door) var(--ease-door);
+      /* 各三角形の形と初期位置 */
+      &.door--top {
+        clip-path: polygon(0 0, 100% 0, 50% 50%);
+        transform: translate(0, -100%);
+      }
+      &.door--right {
+        clip-path: polygon(100% 0, 100% 100%, 50% 50%);
+        transform: translate(100%, 0);
+      }
+      &.door--bottom {
+        clip-path: polygon(0 100%, 100% 100%, 50% 50%);
+        transform: translate(0, 100%);
+      }
+      &.door--left {
+        clip-path: polygon(0 0, 0 100%, 50% 50%);
+        transform: translate(-100%, 0);
+      }
+    }
+
+    /* 正解時：4方向から中央へ */
+    &.correct-effect .door {
+      transform: translate(0, 0);
+    }
+
+    &.is-shine {
+      --bg-grad-block: var(--color-accent-gold);
+    }
+
+    &:active {
+      transform: scale(0.95);
+    }
+
+    &.miss-effect {
+      --bg-grad-block: #ff0000;
+    }
+  }
+
+  .game-info {
+    font-size: clamp(2.5rem, 6cqi, 8rem);
+    letter-spacing: 0.05em;
+    color: var(--color-accent-cyan);
+    text-shadow: 0.05em 0.05em 0 #c6fdec;
+  }
+
+  .level-info {
+    font-size: clamp(2.5rem, 3.5cqi, 5rem);
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    color: var(--color-accent-blue-dark);
+    text-shadow: 0.04em 0.04em 0 #555;
+
+    & .level-num {
+      font-size: clamp(4rem, 7cqi, 9rem);
+      font-weight: 600;
+      margin-left: 0.3em;
+    }
+  }
+
+  .start-info {
+    font-size: clamp(2rem, 4cqi, 5rem);
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    color: var(--color-accent-red);
+  }
+
+  .btn-title-back {
+    font-size: clamp(1.5rem, 2cqi, 3rem);
+    border: none;
+    background: transparent;
+    color: var(--color-text-main);
+    cursor: pointer;
+    &:hover {
+      color: rgb(108, 255, 223);
+    }
+  }
+
+  /* --- タイマー＆カウンター関係 --- */
+  .timer-char {
+    color: var(--color-accent-blue);
+    font-size: clamp(1.5rem, 5cqi, 6rem);
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-shadow: 0.04em 0.04em 0 var(--color-text-muted);
+  }
+
+  .timer-sec,
+  .timer-ms {
+    display: inline-block;
+    width: 2.2ch;
+    &.timer-sec {
+      color: var(--color-accent-cyan);
+      font-size: min(7cqi, 9rem);
+      letter-spacing: 0.05em;
+      text-shadow: 0.04em 0.04em 0 var(--color-shadow-light);
+    }
+    &.timer-ms {
+      color: var(--color-accent-cyan);
+      font-size: min(4cqi, 5rem);
+      letter-spacing: 0.03em;
+      text-shadow: 0.03em 0.03em 0 var(--color-shadow-light);
+    }
+  }
+
+  .colon {
+    position: relative;
+    top: -0.25em;
+    color: var(--color-accent-cyan);
+    font-size: clamp(1.5rem, 3.5cqi, 5.5rem);
+    letter-spacing: 0.03em;
+    text-shadow: 0.02em 0.02em 0 var(--color-shadow-light);
+  }
+
+  .counter {
+    font-size: min(8cqi, 6rem);
+    color: var(--color-text-main);
+    text-shadow: 0.04em 0.04em 0 var(--color-shadow-light);
+  }
+
+  .countdown {
+    font-size: clamp(15rem, 40dvw, 40rem);
+    font-weight: 900;
+
+    background: linear-gradient(
+      135deg,
+      var(--color-accent-gold) 0%,
+      var(--color-accent-gold) 33.3%,
+      var(--color-text-main) 33.3%,
+      var(--color-text-main) 66.6%,
+      var(--color-accent-gold) 66.6%,
+      var(--color-accent-gold) 100%
+    );
+
+    background-size: 300% 300%;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    -webkit-text-stroke: 0.03em var(--color-bg-base);
+
+    text-shadow: 0.04em 0.04em 0 var(--color-shadow-dark);
+    will-change: transform, opacity, background-position;
+  }
+
+  .result-shutter-top,
+  .result-shutter-bottom {
+    width: 100%;
+    height: 50%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .slat {
+    width: 100%;
+    height: 100%;
+
+    /* 最初は潰しておく */
+    transform: scaleY(0);
+
+    box-shadow:
+      inset 0 8px 8px rgba(255, 255, 255, 0.7),
+      inset 0 -4px 6px rgba(0, 0, 0, 0.4);
+
+    /* スマホ用グラデーション */
+    background: radial-gradient(
+      circle at 100% 100%,
+      #0800ff 0%,
+      #007bff 70%,
+      #00ffd5 100%
+    );
+
+    /* 💻 PC用グラデーション（ネストの中にそのまま書く！） */
+    @media (width >= 1280px) {
+      /* 光のピークを「下」に持ってくる！ */
+      background: linear-gradient(
+        to bottom,
+        #0800ff 0%,
+        #007bff 80%,
+        #00ffd5 100%
+      );
+    }
+  }
+
+  .result-shutter-top .slat {
+    transform-origin: top;
+  }
+
+  /* =========================================
+   下のシャッター（ベースとの「差分」だけ書く！）
+========================================= */
+  .result-shutter-bottom .slat {
+    transform-origin: bottom;
+
+    /* スマホ用グラデーション（上書き） */
+    background: radial-gradient(
+      circle at 10em -5em,
+      #0800ff 0%,
+      #007bff 70%,
+      #00ffd5 100%
+    );
+
+    /* 💻 PC用グラデーション（上書き） */
+    @media (width >= 1280px) {
+      /* 光のピークを「上」に持ってくる！ */
+      background: linear-gradient(
+        to top,
+        #0800ff 0%,
+        #007bff 80%,
+        #00ffd5 100%
+      );
+    }
+  }
+
+  .result-title {
+    color: var(--title-color); /* jsから結果を受け取る */
+    letter-spacing: 0.05em;
+    text-shadow: var(--title-shadow);
+    font-size: clamp(6rem, 13cqi, 20rem);
+    white-space: normal;
+    word-wrap: break-word;
+    transform: translateY(clamp(-1.2rem, -5cqi, -4rem));
+
+    &.clear-color {
+      --title-color: var(--color-accent-gold);
+      --title-shadow: 0.05em 0.05em rgb(255, 251, 174);
+    }
+    &.failed-color {
+      --title-color: var(--color-accent-red);
+      --title-shadow: 0.05em 0.05em rgb(185, 75, 75);
+    }
+    @media (width >= 1200px) {
+      transform: translateY(clamp(-8rem, -4.5cqi, -3.5rem));
+    }
+  }
+
+  .game-btn {
+    position: relative;
+    font-size: clamp(2.5rem, 5cqi, 6rem);
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: var(--color-text-main);
+    text-shadow: 0.05em 0.05em 0 var(--color-accent-blue);
+    background: none;
+    border: none;
+    cursor: pointer;
+
+    &::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 0.08em;
+      background-color: var(--color-accent-aqua);
+
+      transform: scale(0);
+      transform-origin: right;
+      transition: transform var(--duration-slow) var(--ease-shutter);
+    }
+
+    &:hover {
+      color: var(--color-accent-aqua);
+      transform: translateY(-0.08em);
+    }
+    &:hover::after {
+      transform: scaleX(1);
+      transform-origin: left;
+    }
+    &:active {
+      transform: translateY(0.08em);
+    }
+  }
+}
+
+/* =========================================
+   6. State (状態管理 / @layer state)
+========================================= */
+@layer state {
+  .screen.is-active {
+    visibility: visible;
+    pointer-events: auto;
+    z-index: var(--z-screen);
+
+    & .container {
+      filter: blur(0) brightness(1);
+      transition: filter var(--duration-slow) var(--ease-smooth);
+    }
+
+    /* ⏱️ 時間や動きが違うものは個別に残す */
+    & .title-wrapper > h1 {
+      animation: title-fade-in var(--duration-title) ease forwards;
+    }
+    & .menu-list {
+      animation: menu-fade-in var(--duration-menu) ease forwards
+        var(--duration-slow);
+    }
+
+    & .slat {
+      animation: shutter-close 1s var(--ease-shutter) both;
+    }
+
+    /* 共通パーツはカンマでまとめて `fade-in` を使い回す */
+    & .info-container,
+    & .timer-container,
+    & .count-container,
+    & .game-board,
+    & .result-container {
+      animation: fade-in var(--duration-slow) ease forwards;
+    }
+    & .result-container {
+      animation-delay: 1s;
+    }
+  }
+
+  .screen.is-leaving {
+    visibility: visible;
+    pointer-events: none;
+    z-index: var(--z-screen);
+
+    /* 時間や動きが違うものは個別に残す */
+    & .title-wrapper > h1 {
+      animation: title-fade-out 1s ease forwards;
+    }
+    & .menu-list {
+      animation: menu-fade-out var(--duration-menu) ease forwards;
+    }
+
+    /* scale-fade-out を使い回す */
+    & .title-back {
+      animation: scale-fade-out var(--duration-base) ease forwards;
+    }
+
+    & .kanban-container,
+    & .info-container,
+    & .timer-container,
+    & .count-container,
+    & .game-board {
+      animation: fade-out var(--duration-slow) ease forwards;
+    }
+    & .slat {
+      animation: shutter-open 1s var(--ease-shutter) both;
+    }
+  }
+
+  /* カウントダウン用アニメーション */
+  .countdown-container {
+    &.countdown {
+      animation: countdown-pop 1s ease-out forwards;
+
+      &.go-anim {
+        animation: go-animation 1.5s ease-in forwards;
+      }
+    }
+  }
+
+  /* --- コンポーネントの状態 --- */
+  .hamburger-menu.is-active {
+    & span:nth-child(1) {
+      transform: translate(0px, var(--burger-offset)) rotate(315deg);
+    }
+    & span:nth-child(2) {
+      opacity: 0;
+      transform: translateX(calc(var(--burger-slide) * -1));
+    }
+    & span:nth-child(3) {
+      transform: translate(0px, calc(var(--burger-offset) * -1)) rotate(-315deg);
+    }
+  }
+
+  .nav-container.is-active {
+    visibility: visible;
+    transform: translateX(0);
+    opacity: 1;
+  }
+
+  /* bodyの名札が特定の画面の時だけ、ヘッダーを透明にして触れなくする！ */
+  body[data-current-screen="level-screen"] .hamburger-menu,
+  body[data-current-screen="info-screen"] .hamburger-menu,
+  body[data-current-screen="game-screen"] .hamburger-menu,
+  body[data-current-screen="result-screen"] .hamburger-menu {
+    opacity: 0;
+    transform: scale(0.5);
+    pointer-events: none; /* クリックも無効化 */
+  }
+
+  /* 魔法の :has() エフェクト */
+  body:has(.nav-container.is-active) .screen.is-active .container {
+    filter: blur(var(--blur-overlay)) brightness(0.6);
+    transition: filter var(--duration-slow) var(--ease-smooth);
+    pointer-events: none;
+  }
+
+  .level-card.is-locked {
+    opacity: 0.3;
+    cursor: not-allowed;
+    filter: grayscale(0.8);
+  }
+
+  .level-card:not(.is-locked) .lock-icon {
+    display: none;
+  }
+
+  .game-board:not(.is-playing) {
+    pointer-events: none;
+  }
+
+  /* --- ドラッグ時の状態 --- */
+  /* GPUアクセラレーションの準備（will-change） */
+  .is-floating {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: var(--z-drag);
+    margin: 0;
+    cursor: grabbing;
+    pointer-events: none;
+    will-change: transform;
+  }
+
+  /* 必ず全称セレクタ (*) をつけて、強制上書きする！ */
+  .is-dragging,
+  .is-dragging * {
+    cursor: grabbing !important;
+  }
+
+  /* リザルトボタンのfailed時のつけ外し用 */
+  .is-hidden {
+    display: none !important;
+  }
+}
+
+/* =========================================
+   7. Animations (@layer animations)
+========================================= */
+@layer animations {
+  /* =========================================
+     汎用アニメーション（これらを使い回す！）
+  ========================================= */
+  /* 共通フェードイン */
+  @keyframes fade-in {
+    0% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+
+  /* 共通フェードアウト */
+  @keyframes fade-out {
+    0% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+
+  /* 共通スケールフェードアウト（ハンバーガーとタイトルバックがコレ！） */
+  @keyframes scale-fade-out {
+    0% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    100% {
+      opacity: 0;
+      transform: scale(0.5);
+    }
+  }
+
+  /* 点滅 */
+  @keyframes blinking {
+    0% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0.3;
+    }
+  }
+
+  /* =========================================
+     固有アニメーション（位置移動を伴うもの）
+  ========================================= */
+
+  @keyframes title-fade-in {
+    0% {
+      opacity: 0;
+      transform: translateY(-20%);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0%);
+    }
+  }
+
+  @keyframes title-fade-out {
+    0% {
+      opacity: 1;
+      transform: translateY(0%);
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(-20%);
+    }
+  }
+
+  @keyframes menu-fade-in {
+    0% {
+      opacity: 0;
+      transform: translate(10%, -10%);
+    }
+    100% {
+      opacity: 1;
+      transform: translate(0%);
+    }
+  }
+
+  @keyframes menu-fade-out {
+    0% {
+      opacity: 1;
+      transform: translate(0%);
+    }
+    100% {
+      opacity: 0;
+      transform: translate(-10%, 10%);
+    }
+  }
+
+  /* =========================================
+     特殊演出用アニメーション（カウントダウン等）
+  ========================================= */
+  @keyframes countdown-pop {
+    0% {
+      opacity: 1;
+      transform: scale(0.5) rotateY(180deg);
+      background-position: 100% 100%;
+    }
+    60% {
+      opacity: 1;
+      transform: scale(0.5) rotateY(360deg);
+      background-position: 100% 100%;
+    }
+    100% {
+      opacity: 0;
+      transform: scale(0.5) rotateY(270deg);
+      background-position: 100% 100%;
+    }
+  }
+
+  @keyframes go-animation {
+    0% {
+      opacity: 1;
+      transform: scale(0.05);
+      background-position: 50% 50%;
+    }
+    30%,
+    60% {
+      opacity: 1;
+      transform: scale(1);
+      background-position: 0% 0%;
+    }
+    80% {
+      opacity: 1;
+      transform: scale(0.75);
+      background-position: 50% 50%;
+    }
+    92% {
+      opacity: 1;
+      transform: scale(0.5);
+      background-position: 100% 100%;
+    }
+    100% {
+      opacity: 0;
+      transform: scale(0);
+      background-position: 100% 100%;
+    }
+  }
+
+  @keyframes shutter-close {
+    0% {
+      transform: scaleY(0);
+    }
+    100% {
+      transform: scaleY(1);
+    }
+  }
+
+  @keyframes shutter-open {
+    0% {
+      transform: scaleY(1);
+    }
+    100% {
+      transform: scaleY(0);
+    }
+  }
+}

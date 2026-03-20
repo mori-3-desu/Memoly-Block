@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>クリックしたらタイトルとボタンがふわっと消える</title>
+    <link rel="stylesheet" href="css/fadestate.css" />
+  </head>
+
+  <body>
+    <section id="title">
+      <h1 class="title-name">ふわっと消えるアニメーション</h1>
+
+      <main>
+        <div class="content-wrapper">
+          <h2 class="practice">
+            練習でクリックしてアニメーションを消してみよう
+          </h2>
+          <p class="bounce-information">▼ ここをクリックしてね ▼</p>
+        </div>
+
+        <button
+          id="fade-btn"
+          class="btn-animation"
+          aria-label="タイトルボタンフェードアニメーション"
+          type="button"
+        >
+          fade発火🔥
+        </button>
+      </main>
+    </section>
+
+    <script src="js/fadestate.js" defer></script>
+  </body>
+</html>

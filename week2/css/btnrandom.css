@@ -1,0 +1,36 @@
+:root {
+  --unit: min(calc(100vw / 192), calc(100vh / 108));
+  --border-color: #222;
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center; 
+
+  /* ▼ ボタン同士の隙間はここで調整（好きな広さに変えてOK） */
+  gap: calc((var(--unit)) * 5);
+}
+
+.random-btn {
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-size: calc((var(--unit)) * 3.5);
+  font-weight: bold;
+  border-radius: 100px;
+  border: 0.2em solid var(--border-color); 
+  padding: 0.5em 2em;
+  box-sizing: border-box;
+}
+
+.btn-lunch {
+    min-width: 300px;
+}
+
+/* ここでは省きますがメディア対応書いてもいいかも */

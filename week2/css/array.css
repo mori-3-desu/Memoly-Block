@@ -1,0 +1,77 @@
+html {
+  font-size: 62.5%;
+}
+
+body {
+  margin: 0;
+  background-color: #2b2b2b; /* ちょっと高級感あるダーク背景 */
+  color: #fff;
+  font-family: sans-serif;
+
+  /* 画面のど真ん中に配置する最強セット */
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem; /* スマホで端っこがくっつかないように */
+  box-sizing: border-box;
+}
+
+/* --- 盤面 --- */
+#board {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  /* ★重要：これがないと中身が空のとき高さが潰れます */
+  grid-template-rows: repeat(6, 1fr); 
+  
+  /* レスポンシブな隙間：最小4px、推奨1.5vw、最大10px */
+  gap: clamp(4px, 1.5vw, 10px); 
+  
+  width: 100%;
+  
+  /* 「500px」または「画面の横幅90%」の小さい方を採用 */
+  max-width: min(500px, 90vw);
+  
+  aspect-ratio: 1 / 1;
+  margin-bottom: 3rem; /* ボタンとの距離 */
+  
+  /* 盤面自体の影（浮いてる感） */
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  background-color: rgb(125, 125, 125); /* うっすら背景 */
+  padding: clamp(5px, 1vw, 15px); /* 外枠との余白 */
+  border-radius: 12px;
+}
+
+/* --- ブロック --- */
+.block {
+  background-color: #444;
+  /* %指定にするとサイズが変わっても丸みが綺麗です */
+  border-radius: 15%; 
+  cursor: pointer;
+  
+  /* ちらつき防止 */
+  will-change: background-color; 
+}
+
+/* --- ボタン装飾 --- */
+#btn {
+  background: #fff;
+  color: #333;
+  border: none;
+  padding: 1rem 4rem;
+  font-size: 1.6rem;
+  font-weight: bold;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: transform 0.1s, opacity 0.2s;
+}
+
+#btn:active {
+  transform: scale(0.95);
+}
+
+#btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

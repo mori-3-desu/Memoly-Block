@@ -1,0 +1,48 @@
+/* ベースの空（修正版） */
+body {
+  /* グラデーションを少し修正しました */
+  background: linear-gradient(
+    to bottom,
+    hsla(225, 70%, 15%, 1) 0%,
+    /* 上：深い青緑 */ rgb(40, 62, 134) 60%,
+    /* 中：中くらいの青緑 */ rgb(21, 81, 186) 100% /* 下：少し明るい青緑 */
+  );
+  overflow: hidden;
+  margin: 0;
+  height: 100vh;
+}
+
+#star-sky {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+/* ▼▼▼ 追加：星の素材 ▼▼▼ */
+.star {
+  position: absolute;
+  background-color: white;
+  border-radius: 50%; /* 丸くする */
+  opacity: 0.8;
+  animation: twinkle 3s infinite ease-in-out; /* キラキラさせる */
+}
+
+.star.glow {
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.8); /* ぼんやり光らせる */
+}
+
+/* 星が瞬くアニメーション */
+@keyframes twinkle {
+  0% {
+    opacity: 0.2;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+  100% {
+    opacity: 0.2;
+    transform: scale(0.8);
+  }
+}
