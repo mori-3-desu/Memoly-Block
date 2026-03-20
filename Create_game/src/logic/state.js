@@ -1,4 +1,4 @@
-import { LOCKCLASS } from "../utils/constant.js";
+import { LOCKCLASS } from "../utils/constants.js";
 
 export class GameSelect {
   // 初期値

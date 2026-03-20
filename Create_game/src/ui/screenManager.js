@@ -1,4 +1,4 @@
-import { TRANSITION_CONFIG } from "../utils/constant.js";
+import { TRANSITION_CONFIG } from "../utils/constants.js";
 import { toggleGlobalNavigation } from "./nav.js";
 
 const { ANM_OPEN, ANM_CLOSE, FALLBACK_TIME_MS } = TRANSITION_CONFIG;

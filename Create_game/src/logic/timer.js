@@ -1,4 +1,4 @@
-import { GAME_CONFIG } from "../utils/constant.js";
+import { GAME_CONFIG } from "../utils/constants.js";
 
 const { TIME_LIMIT_MS } = GAME_CONFIG;
 

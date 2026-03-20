@@ -1,5 +1,5 @@
-import { delay, PLAYING } from "../utils/constant.js";
 import { board } from "../ui/dom.js";
+import { delay, PLAYING } from "../utils/constants.js";
 
 const SHINE = "is-shine";
 const IDLE = 100;

@@ -1,10 +1,6 @@
-import {
-  delay,
-  levelSettings,
-  SCREEN_ID,
-} from "../utils/constant.js";
 import { createBoard } from "../ui/createBoard.js";
 import { changeScreen } from "../ui/screenManager.js";
+import { delay, levelSettings, SCREEN_ID } from "../utils/constants.js";
 import { flashAnimation } from "./gameLogic.js";
 import { startGame, updateGameCounter } from "./gameManager.js";
 import { resetTimerUI, stopTimer } from "./timer.js";

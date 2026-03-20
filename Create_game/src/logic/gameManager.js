@@ -1,6 +1,6 @@
-import { GAME_STATUS, PLAYING, SCREEN_ID, delay } from "../utils/constant.js";
 import { board } from "../ui/dom.js";
 import { changeScreen } from "../ui/screenManager.js";
+import { GAME_STATUS, PLAYING, SCREEN_ID, delay } from "../utils/constants.js";
 import { handleClearScreen, handleGameOverScreen } from "./gameResultFlow.js";
 import { startTimer, stopTimer } from "./timer.js";
 

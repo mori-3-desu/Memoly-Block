@@ -1,4 +1,4 @@
-import { GAME_CONFIG, GAME_STATUS } from "../utils/constant.js";
+import { GAME_CONFIG, GAME_STATUS } from "../utils/constants.js";
 import { setReadyGame } from "./gameFlow.js";
 import { game } from "./state.js";
 

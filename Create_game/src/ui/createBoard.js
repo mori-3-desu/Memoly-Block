@@ -1,4 +1,4 @@
-import { GAME_CONFIG } from "../utils/constant.js";
+import { GAME_CONFIG } from "../utils/constants.js";
 import { board } from "./dom.js";
 
 /* 盤面のクラス */
