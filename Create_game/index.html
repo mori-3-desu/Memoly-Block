@@ -2,6 +2,21 @@
 <html lang="ja">
   <head>
     <meta charset="UTF-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="
+    default-src 'none';
+    script-src 'self';
+    style-src 'self' https://fonts.googleapis.com;
+    font-src https://fonts.gstatic.com;
+    img-src 'self';
+    frame-ancestors 'none';
+    base-uri 'self';
+    form-action 'none';
+    X-Content-Type-Options 'nosniff';
+    Referrer-Policy 'no-referrer';
+    "
+    />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="keywords"
@@ -188,11 +203,7 @@
         <div class="result-container">
           <h2 class="result-title"></h2>
           <div class="result-actions">
-            <button
-              class="game-btn game-next-btn"
-              data-level="1"
-              type="button"
-            >
+            <button class="game-btn game-next-btn" data-level="1" type="button">
               NEXT
             </button>
             <button

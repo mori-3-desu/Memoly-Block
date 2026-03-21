@@ -38,7 +38,7 @@ export const flashAnimation = async (config, signal) => {
 // ── 部品 ────────────────────────────────────────────────
 
 // 正解の配列を生成
-const generateSequence = (count, length, lastIndex) => {
+export const generateSequence = (count, length, lastIndex) => {
   const sequence = []; // 正解の配列を入れる
   let current = lastIndex;
 

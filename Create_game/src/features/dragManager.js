@@ -1,6 +1,6 @@
 import { setReadyGame } from "../logic/gameFlow.js";
-import { DRAG_CONFIG, dragStatus } from "../utils/constant.js";
 import { columns } from "../ui/dom.js";
+import { DRAG_CONFIG, dragStatus } from "../utils/constants.js";
 import {
   handleCardDrag,
   releaseLevelCard,

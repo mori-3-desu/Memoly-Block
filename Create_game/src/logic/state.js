@@ -1,5 +1,3 @@
-import { LOCKCLASS } from "../utils/constants.js";
-
 export class GameSelect {
   // 初期値
   movingDrag = "";
@@ -12,6 +10,9 @@ export class GameSelect {
   // レベルをクリアした時の処理
   clearLevel(level) {
     const numLevel = Number(level);
+
+    // isFineteを考えたが小数も通ってしまう為Integerを採用
+    if(!Number.isInteger(numLevel) || numLevel < 1) return;
 
     // 既にクリアしてたら何もしない
     if (this.clearedLevels.has(numLevel)) return;
@@ -27,14 +28,6 @@ export class GameSelect {
 
   // 次のレベルを解除する処理
   unlockNextLevel(nextlevel) {
-    const nextCard = document.querySelector(
-      `.level-card[data-level="${nextlevel}"]`,
-    );
-
-    // 解放するカードがなかったら全クリなので終了
-    if (!nextCard) return;
-
-    nextCard.classList.remove(LOCKCLASS);
     this.currentLevel = nextlevel; // プレイ可能レベルを更新
   }
 

@@ -2,7 +2,7 @@ import { GAME_CONFIG } from "../utils/constants.js";
 import { board } from "./dom.js";
 
 /* 盤面のクラス */
-const BOARD_CONFIG = {
+export const BOARD_CONFIG = {
   TYPE_DIV: "div",
   TYPE_SPAN: "span",
   CLASS_BLOCK: "block",
@@ -16,10 +16,8 @@ const { TYPE_DIV, TYPE_SPAN, CLASS_BLOCK, CLASS_DOOR, DOOR_DIRECTIONS } =
 
 // 盤面生成
 export const createBoard = () => {
-  // idが無かったら抜ける
   if (!board) return;
 
-  // 仮の箱を用意
   const fragment = document.createDocumentFragment();
 
   for (let i = 0; i < GRID_SIZE; i++) {

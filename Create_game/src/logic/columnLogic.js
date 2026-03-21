@@ -3,8 +3,8 @@ import {
   revertLevelCardToTodo,
   setLevelCardToDoing,
 } from "../features/dragManager.js";
-import { dragStatus } from "../utils/constant.js";
 import { columns } from "../ui/dom.js";
+import { dragStatus } from "../utils/constants.js";
 import { game } from "./state.js";
 
 // 離した列の位置を判定する処理

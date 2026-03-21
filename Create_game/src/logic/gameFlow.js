@@ -41,15 +41,28 @@ export const setReadyGame = async (level) => {
   gameController = new AbortController();
   const { signal } = gameController;
 
-  // data-levelに応じたゲームを取得
-  const currentLevelConfig = levelSettings[level];
+  const config = validateLevelConfig(level);
+  if (!config) return;
 
-  // 設定データが無かったら抜ける
-  if (!currentLevelConfig) return;
-
-  resetGameStates(level, currentLevelConfig);
+  resetGameStates(level, config);
   await changeScreen(INFO);
-  waitStartClick(currentLevelConfig, signal);
+  waitStartClick(config, signal);
+};
+
+// 設定のバリデーションチェック
+export const validateLevelConfig = (level) => {
+  const config = levelSettings[level];
+  if (!config) return null;
+
+  const { flashCount, flashSpeed } = config;
+
+  // Numberの型チェックでORで確認していたけど冗長だと判断
+  // 上記で分割代入を使い、何を検証するかを明示してeveryで完結に
+  if (![flashCount, flashSpeed].every(Number.isInteger)) {
+    console.error(`[Config] Invalid levelSettings for level ${level}:`, config);
+    return null;
+  }
+  return config;
 };
 
 // ゲーム開始前のユーザー入力待機画面処理

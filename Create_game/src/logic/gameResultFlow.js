@@ -1,4 +1,4 @@
-import { GAME_CONFIG, GAME_STATUS } from "../utils/constants.js";
+import { GAME_CONFIG, GAME_STATUS, LOCKCLASS } from "../utils/constants.js";
 import { setReadyGame } from "./gameFlow.js";
 import { game } from "./state.js";
 
@@ -58,7 +58,7 @@ export const initResultBtn = () => {
   });
 };
 
-// CLEARの処理
+// CLEAR時の処理
 export const handleClearScreen = (status, level) => {
   // クリア以外が渡されてないかここでもう一回確認(違うステータスで動くのを防ぐ)
   if (status !== CLEAR) {
@@ -66,9 +66,11 @@ export const handleClearScreen = (status, level) => {
     return;
   }
 
-  setButtonNavigation(status, level); // レベルボタンの行き先をセット
-  game.clearLevel(level); // CLEARしたらレベル解除と鍵解放のクラスを使う
-  updateResultText(status); // datasetを見て判断
+  // MAXレベルまで進んだらここはupdateResultしか実行されない
+  setButtonNavigation(status, level);
+  game.clearLevel(level);
+  unlockNextLevelCard(level);
+  updateResultText(status);
 };
 
 // ゲームオーバー時の処理
@@ -119,6 +121,17 @@ const setNavigationResultBtn = (status, isLastLevel) => {
 
   // 上限のレベルと失敗時はnextボタンを外す
   resultSelectBtns.next.classList.toggle(HIDDEN_CLASS, isReachedMax);
+};
+
+// 次のレベルカードのロックを外すDOM操作
+const unlockNextLevelCard = (level) => {
+  // 1しか上がらないのであえて数字を残している
+  const nextLevel = Number(level) + 1;
+  const nextCard = document.querySelector(
+    `.level-card[data-level="${nextLevel}"]`,
+  );
+  if (!nextCard) return;
+  nextCard.classList.remove(LOCKCLASS);
 };
 
 // 結果によって文字を変える処理

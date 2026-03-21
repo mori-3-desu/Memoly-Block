@@ -1,7 +1,7 @@
 import { handleColumnDrop } from "../logic/columnLogic.js";
 import { game } from "../logic/state.js";
 import { cards } from "../ui/dom.js";
-import { DRAG_CONFIG, dragStatus, SCREEN_ID } from "../utils/constant.js";
+import { DRAG_CONFIG, dragStatus, SCREEN_ID } from "../utils/constants.js";
 import { setupCardDrag } from "./dragManager.js";
 
 const { SELECT } = SCREEN_ID;
