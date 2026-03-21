@@ -37,7 +37,7 @@ class PuddleEffect {
     });
 
     // 3. 操作イベント登録
-    this.wrapper.addEventListener("animationEnd", this.handleAnimationEnd);
+    this.wrapper.addEventListener("animationend", this.handleAnimationEnd);
     this.wrapper.addEventListener("pointerdown", this.handlePointerDown);
     window.addEventListener("pointermove", this.handlePointerMove);
     window.addEventListener("pointerup", this.handleStop);

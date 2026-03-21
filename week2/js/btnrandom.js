@@ -103,7 +103,7 @@ if (lunchBtn) {
       // 演出用なので、ここは普通のランダムでOK
       const tempIndex = Math.floor(Math.random() * LUNCH_CONFIG.length);
       lunchBtn.textContent = LUNCH_CONFIG[tempIndex];
-    }, SELECT_TIMER_CONFIG);
+    }, SPINING_TIME);
 
     setTimeout(() => {
       clearInterval(intervalId);
