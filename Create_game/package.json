@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "dev": "vite",
     "test": "vitest",
     "test:run": "vitest run"
   },
@@ -13,6 +14,7 @@
   "type": "module",
   "devDependencies": {
     "jsdom": "^29.0.1",
+    "vite": "^8.0.1",
     "vitest": "^4.1.0"
   }
 }
