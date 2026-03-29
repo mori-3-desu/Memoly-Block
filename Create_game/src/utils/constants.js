@@ -28,7 +28,7 @@ export const PLAYING = "is-playing";
 
 // ドラッグの状態を一括管理する
 export const dragStatus = {
-  activecard: null,
+  activeCard: null,
   dragAbort: null,
   animationId: null,
   shiftX: 0,
