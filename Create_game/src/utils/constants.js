@@ -28,14 +28,13 @@ export const PLAYING = "is-playing";
 
 // ドラッグの状態を一括管理する
 export const dragStatus = {
-  dragcard: null,
+  activecard: null,
   dragAbort: null,
   animationId: null,
   shiftX: 0,
   shiftY: 0,
 };
 
-// TODO:完成したらあてはめる
 export const GAME_STATUS = {
   CLEAR: "CLEAR",
   FAILED: "FAILED",
@@ -51,7 +50,7 @@ export const GAME_CONFIG = {
 
 /* 難易度設定 */
 export const levelSettings = {
-  1: { level: 1, flashCount: 5, flashSpeed: 900 },
+  1: { level: 1, flashCount: 5, flashSpeed: 1000 },
   2: { level: 2, flashCount: 7, flashSpeed: 700 },
   3: { level: 3, flashCount: 10, flashSpeed: 400 },
 };

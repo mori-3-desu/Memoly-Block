@@ -92,13 +92,13 @@ export const launchGameSequence = async (config, signal) => {
   await changeScreen(GAME);
 
   if (signal?.aborted) return;
-  await playCountdownAnimation(config);
+  await playCountdownAnimation(config, signal);
 };
 
 // カウントダウンからフラッシュまで
 export const playCountdownAnimation = async (config, signal) => {
   await gameStartCountdown(signal);
-  await presentPattern(config);
+  await presentPattern(config, signal);
 };
 
 // カウントダウンメイン処理

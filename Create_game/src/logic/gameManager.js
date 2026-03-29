@@ -30,6 +30,9 @@ export const startGame = (config, answerSequence, signal) => {
     board.classList.add(PLAYING);
   }
 
+  gameController?.abort();
+  gameController = new AbortController();
+
   initGameState(config, answerSequence);
 
   // タイマーを始動させる、0になったらゲームオーバーを呼ぶ(密結合を防止するためにここでendGameを呼ぶ)
@@ -45,7 +48,9 @@ export const startGame = (config, answerSequence, signal) => {
     return;
   }
 
-  board.addEventListener("click", handleBlockClick, { signal });
+  board.addEventListener("click", handleBlockClick, {
+    signal: gameController.signal,
+  });
 };
 
 // エフェクトとアニメーションの時間を定義
@@ -88,7 +93,7 @@ const handleBlockClick = async (e) => {
     updateGameCounter(currentStep);
     if (currentStep === currentAnswer.length) endGame(CLEAR);
   } else {
-    playBlockEffect(target, BLOCK_EFFECT.MISS);
+    await playBlockEffect(target, BLOCK_EFFECT.MISS);
     endGame(FAILED);
   }
 };
@@ -97,6 +102,7 @@ const handleBlockClick = async (e) => {
 const cleanupGame = () => {
   stopTimer();
   gameController?.abort();
+  gameController = null;
   board.classList.remove(PLAYING);
 };
 
