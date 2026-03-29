@@ -1,6 +1,6 @@
 # MEMORY BLOCK
 
-![demo](https://github.com/user-attachments/assets/dd292e8c-28be-4306-8bfa-a5c1aee1a0d6)
+https://github.com/user-attachments/assets/dd292e8c-28be-4306-8bfa-a5c1aee1a0d6
 
 勉強目的で作成した Vanilla JS の記憶力ゲームです。
 今回は学習がメインなのでデプロイはしていません。
